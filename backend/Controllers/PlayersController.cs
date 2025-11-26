@@ -9,6 +9,7 @@ using backend.Context;
 using backend.Models;
 using backend.Dtos.Player;
 using backend.Services;
+using backend.Dtos.TeamPlayer;
 
 namespace backend.Controllers
 {
@@ -63,6 +64,30 @@ namespace backend.Controllers
             }
 
             return Ok(player);
+        }
+
+        //GET: api/Players/5/team
+        [HttpGet("{id}/team")]
+        public async Task<ActionResult<GetTeamPlayerDto>> GetPlayersTeam(int id)
+        {
+            var teamPlayer = await _context.TeamPlayers
+                .Where(tp => tp.PlayerId == id)
+                .Select(tp => new GetTeamPlayerDto
+                {
+                    Id = tp.PlayerId,
+                    TeamId = tp.TeamId,
+                    TeamName = tp.Team!.Name,
+                    PlayerId = tp.PlayerId,
+                    PlayerName = tp.Player!.Name,
+                })
+                .FirstOrDefaultAsync();
+
+            if (teamPlayer == null)
+            {
+                return NotFound("Player not found in any team");
+            }
+
+            return Ok(teamPlayer);
         }
 
         // PUT: api/Players/5
