@@ -18,8 +18,7 @@ namespace backend.Models
         public int TeamPlayerId { get; set; }
         public TeamPlayer? TeamPlayer { get; set; }
         [Required]
-        public int EventId { get; set; }
-        public Event? Event { get; set; }
+        public EventType EventType { get; set; }
 
         [Required]
         [Range(0, 120)]

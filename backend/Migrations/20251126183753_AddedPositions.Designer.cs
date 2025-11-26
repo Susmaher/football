@@ -12,8 +12,8 @@ using backend.Context;
 namespace backend.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20251124132314_Added fields to teams")]
-    partial class Addedfieldstoteams
+    [Migration("20251126183753_AddedPositions")]
+    partial class AddedPositions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,27 +44,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Divisions");
-                });
-
-            modelBuilder.Entity("backend.Models.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("backend.Models.Field", b =>
@@ -146,7 +125,7 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EventId")
+                    b.Property<int>("EventType")
                         .HasColumnType("int");
 
                     b.Property<int?>("ExtraMinute")
@@ -165,8 +144,6 @@ namespace backend.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventId");
 
                     b.HasIndex("MatchId");
 
@@ -193,12 +170,32 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Position")
-                        .HasColumnType("longtext");
+                    b.Property<int>("PositionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PositionId");
+
                     b.ToTable("Players");
+                });
+
+            modelBuilder.Entity("backend.Models.Position", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("backend.Models.Referee", b =>
@@ -348,12 +345,6 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.MatchEvent", b =>
                 {
-                    b.HasOne("backend.Models.Event", "Event")
-                        .WithMany("MatchEvents")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("backend.Models.Match", "Match")
                         .WithMany("Match_Events")
                         .HasForeignKey("MatchId")
@@ -372,13 +363,22 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
-
                     b.Navigation("Match");
 
                     b.Navigation("Team");
 
                     b.Navigation("TeamPlayer");
+                });
+
+            modelBuilder.Entity("backend.Models.Player", b =>
+                {
+                    b.HasOne("backend.Models.Position", "Position")
+                        .WithMany("Players")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("backend.Models.Team", b =>
@@ -426,11 +426,6 @@ namespace backend.Migrations
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("backend.Models.Event", b =>
-                {
-                    b.Navigation("MatchEvents");
-                });
-
             modelBuilder.Entity("backend.Models.Field", b =>
                 {
                     b.Navigation("Matches");
@@ -446,6 +441,11 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Player", b =>
                 {
                     b.Navigation("TeamPlayer");
+                });
+
+            modelBuilder.Entity("backend.Models.Position", b =>
+                {
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("backend.Models.Referee", b =>

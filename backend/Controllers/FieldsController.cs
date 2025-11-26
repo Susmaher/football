@@ -70,17 +70,19 @@ namespace backend.Controllers
             {
                 return BadRequest("Route ID and body ID do not match");
             }
+
+            var field = await _context.Fields.FindAsync(id);
+            if (field == null)
+            {
+                return BadRequest("Field not found");
+            }
             
             if(await _validationService.NameExistsAsync<Field>(fl.Name, id))
             {
                 return BadRequest("Field this with name already exists");
             }
 
-            var field = new Field
-            {
-                Id = fl.Id,
-                Name = fl.Name,
-            };
+            field.Name = fl.Name;
 
             _context.Entry(field).State = EntityState.Modified;
 
@@ -137,7 +139,7 @@ namespace backend.Controllers
             var field = await _context.Fields.FindAsync(id);
             if (field == null)
             {
-                return NotFound();
+                return NotFound("Field not found");
             }
 
             var hasMatches = await _context.Matches.AnyAsync(m=>m.FieldId == id);

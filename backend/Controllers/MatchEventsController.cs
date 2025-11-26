@@ -42,8 +42,7 @@ namespace backend.Controllers
                     TeamName = me.Team!.Name,
                     TeamPlayerId = me.TeamPlayerId,
                     TeamPlayerName = me.TeamPlayer!.Player!.Name,
-                    EventId = me.EventId,
-                    EventName = me.Event!.Name,
+                    EventType = me.EventType.ToString(),
                     Minute = me.Minute,
                     ExtraMinute = me.ExtraMinute ?? 0,
                 }).ToListAsync();
@@ -67,8 +66,7 @@ namespace backend.Controllers
                     TeamName = me.Team!.Name,
                     TeamPlayerId = me.TeamPlayerId,
                     TeamPlayerName = me.TeamPlayer!.Player!.Name,
-                    EventId = me.EventId,
-                    EventName = me.Event!.Name,
+                    EventType = me.EventType.ToString(),
                     Minute = me.Minute,
                     ExtraMinute = me.ExtraMinute ?? 0,
                 }).FirstOrDefaultAsync();
@@ -97,13 +95,13 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            var validationResponse = await _matchEventValidation.ValidateMatchEventUpdateAsync(me);
-            if (!validationResponse.Success) 
+            var validationResult = await _matchEventValidation.ValidateMatchEventUpdateAsync(me);
+            if (!validationResult.Success) 
             {
-                return BadRequest(validationResponse.Message);
+                return BadRequest(validationResult.Message);
             }
 
-            matchEvent.EventId = me.EventId;
+            matchEvent.EventType = validationResult.data!.EventType;
             matchEvent.TeamId = me.TeamId;
             matchEvent.TeamPlayerId = me.TeamPlayerId;
             matchEvent.MatchId = me.MatchId;
@@ -136,10 +134,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<GetMatchEventDto>> PostMatchEvent(PostMatchEventDto me)
         {
-            var validationResponse = await _matchEventValidation.ValidateMatchEventCreationAsync(me);
-            if (!validationResponse.Success)
+            var validationResult = await _matchEventValidation.ValidateMatchEventCreationAsync(me);
+            if (!validationResult.Success)
             {
-                return BadRequest(validationResponse.Message);
+                return BadRequest(validationResult.Message);
             }
 
             var matchEvent = new MatchEvent
@@ -147,7 +145,7 @@ namespace backend.Controllers
                 MatchId = me.MatchId,
                 TeamId = me.TeamId,
                 TeamPlayerId = me.TeamPlayerId,
-                EventId = me.EventId,
+                EventType = validationResult.data!.EventType,
                 Minute = me.Minute,
                 ExtraMinute = me.ExtraMinute ?? null,
             };
@@ -160,11 +158,10 @@ namespace backend.Controllers
                 Id = matchEvent.Id,
                 MatchId = matchEvent.MatchId,
                 TeamId = matchEvent.TeamId,
-                TeamName = validationResponse.data!.Team!.Name,
+                TeamName = validationResult.data!.Team!.Name,
                 TeamPlayerId = matchEvent.TeamPlayerId,
-                TeamPlayerName = validationResponse.data.Player!.Name,
-                EventId = matchEvent.EventId,
-                EventName = validationResponse.data!.Event!.Name,
+                TeamPlayerName = validationResult.data.Player!.Name,
+                EventType = me.EventType,
                 Minute = matchEvent.Minute,
                 ExtraMinute = matchEvent.ExtraMinute ?? 0,
             };

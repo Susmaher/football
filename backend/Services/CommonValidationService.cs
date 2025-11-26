@@ -1,4 +1,6 @@
 ﻿using backend.Context;
+using backend.Dtos;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
@@ -32,16 +34,27 @@ namespace backend.Services
             return await entity.AnyAsync();
         }
 
-        public async Task<bool> NameAndBirthDateExistsAsync<T>(string name, DateOnly birth_date, int? id) where T : class, IEntityWithNameAndBirthDate
+        public async Task<ServiceResponse<bool>> NameAndBirthDateExistsAsync<T>(string name, DateOnly birth_date, int? id) where T : class, IEntityWithNameAndBirthDate
         {
+            if (birth_date > DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                return new ServiceResponse<bool> { Success = false, Message = "Invalid birth date" };
+            }
+
             var entity = _context.Set<T>().Where(e => e.Name == name && e.Birth_date == birth_date);
 
-            if (id.HasValue) 
+            if (id.HasValue)
             {
                 entity = entity.Where(e => e.Id != id);
             }
 
-            return await entity.AnyAsync();
+            if (await entity.AnyAsync())
+            {
+                var entityName = typeof(T).Name;
+                return new ServiceResponse<bool> { Success = false, Message = $"{entityName} with this name and birth date already exists." };
+            }
+
+            return new ServiceResponse<bool> { Success = true };
         }
     }
 }

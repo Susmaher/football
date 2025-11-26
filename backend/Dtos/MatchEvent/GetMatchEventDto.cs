@@ -10,8 +10,7 @@ namespace backend.Dtos.MatchEvent
         public string TeamName { get; set; }
         public int TeamPlayerId { get; set; }
         public string TeamPlayerName { get; set; }
-        public int EventId { get; set; }
-        public string EventName { get; set; }
+        public string EventType { get; set; }
         public int Minute { get; set; }
         public int ExtraMinute { get; set; }
     }

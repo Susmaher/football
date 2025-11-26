@@ -55,7 +55,7 @@ namespace backend.Controllers
 
             if (referee == null)
             {
-                return NotFound("Referee doesn't exists with this ID");
+                return NotFound("Referee doesn't exist with this ID");
             }
 
             return Ok(referee);
@@ -71,17 +71,20 @@ namespace backend.Controllers
                 return BadRequest("Route ID and body ID do not match");
             }
 
-            if(await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date, rf.Id))
+            var referee = await _context.Referees.FindAsync(id);
+            if (referee == null)
             {
-                return BadRequest("Referee with this name and birth_date already exists");
+                return BadRequest("Referee not found");
             }
 
-            var referee = new Referee
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date, rf.Id);
+            if (!validationResponse.Success)
             {
-                Id = rf.Id,
-                Name = rf.Name,
-                Birth_date = rf.Birth_date,
-            };
+                return BadRequest(validationResponse.Message);
+            }
+
+            referee.Name = rf.Name;
+            referee.Birth_date = rf.Birth_date;
 
             _context.Entry(referee).State = EntityState.Modified;
 
@@ -109,9 +112,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<RefereeDto>> PostReferee(PostRefereeDto rf)
         {
-            if(await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date))
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date);
+            if (!validationResponse.Success)
             {
-                return BadRequest("Referee with this name and birth_date already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             var referee = new Referee 
@@ -140,7 +144,7 @@ namespace backend.Controllers
             var referee = await _context.Referees.FindAsync(id);
             if (referee == null)
             {
-                return NotFound();
+                return NotFound("Referee not found");
             }
 
             var hasMatches = await _context.Matches.AnyAsync(m => m.RefereeId == id);

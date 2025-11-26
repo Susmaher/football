@@ -18,27 +18,35 @@ namespace backend.Services.MatchEventValidation
         }
         public async Task<ServiceResponse<MatchEventValidationData>> ValidateMatchEventCreationAsync(PostMatchEventDto matchEventDto)
         {
-            if(await MatchEventAlreadyExists(matchEventDto.MatchId, matchEventDto.TeamId, matchEventDto.TeamPlayerId, matchEventDto.EventId, matchEventDto.Minute, matchEventDto.ExtraMinute))
+            if(await MatchEventAlreadyExists(matchEventDto.MatchId, matchEventDto.TeamId, matchEventDto.TeamPlayerId, matchEventDto.EventType, matchEventDto.Minute, matchEventDto.ExtraMinute))
             {
                 return new ServiceResponse<MatchEventValidationData> { Success = false, Message = "Match Event with these datas already exists" };
             }
 
-            return await ValidateCommonMatchEventRulesAsync(matchEventDto.TeamId, matchEventDto.MatchId, matchEventDto.TeamPlayerId, matchEventDto.EventId);
+            return await ValidateCommonMatchEventRulesAsync(matchEventDto.TeamId, matchEventDto.MatchId, matchEventDto.TeamPlayerId, matchEventDto.EventType);
         }
 
         public async Task<ServiceResponse<MatchEventValidationData>> ValidateMatchEventUpdateAsync(PutMatchEventDto matchEventDto)
         {
-            if (await MatchEventAlreadyExists(matchEventDto.MatchId, matchEventDto.TeamId, matchEventDto.TeamPlayerId, matchEventDto.EventId, matchEventDto.Minute, matchEventDto.ExtraMinute, matchEventDto.Id))
+            if (await MatchEventAlreadyExists(matchEventDto.MatchId, matchEventDto.TeamId, matchEventDto.TeamPlayerId, matchEventDto.EventType, matchEventDto.Minute, matchEventDto.ExtraMinute, matchEventDto.Id))
             {
                 return new ServiceResponse<MatchEventValidationData> { Success = false, Message = "Match Event with these datas already exists" };
             }
 
-            return await ValidateCommonMatchEventRulesAsync(matchEventDto.TeamId, matchEventDto.MatchId, matchEventDto.TeamPlayerId, matchEventDto.EventId);
+            return await ValidateCommonMatchEventRulesAsync(matchEventDto.TeamId, matchEventDto.MatchId, matchEventDto.TeamPlayerId, matchEventDto.EventType);
         }
 
-        private async Task<ServiceResponse<MatchEventValidationData>> ValidateCommonMatchEventRulesAsync(int teamId, int matchId, int teamPlayerId, int eventId) 
+        private async Task<ServiceResponse<MatchEventValidationData>> ValidateCommonMatchEventRulesAsync(int teamId, int matchId, int teamPlayerId, string eventType) 
         { 
             var response = new ServiceResponse<MatchEventValidationData>();
+
+            //check if the eventType valid
+            if (!Enum.TryParse<EventType>(eventType, true, out var evType))
+            {
+                response.Success = false;
+                response.Message = "Invalid event type provided.";
+                return response;
+            }
 
             //check if team exists
             var team = await _commonValidation.FindByIdAsync<Team>(teamId);
@@ -66,20 +74,11 @@ namespace backend.Services.MatchEventValidation
                 response.Message = "Teamplayer does not exist";
                 return response;
             }
-
-            //check if event exists
-            var @event = await _commonValidation.FindByIdAsync<Event>(eventId);
-            if (@event == null)
-            {
-                response.Success = false;
-                response.Message = "Event does not exist";
-                return response;
-            }
            
             //check if a player doesn't have more than 2 yellowcard
-            if(@event.Name.Equals("yellow card", StringComparison.OrdinalIgnoreCase))
+            if(evType == EventType.YellowCard)
             {
-                if (await _context.MatchEvents.Include(me => me.Event).Where(me => me.MatchId == matchId && me.TeamId == teamId && me.TeamPlayerId == teamPlayerId && me.EventId == eventId).CountAsync() >= 2)
+                if (await _context.MatchEvents.Where(me => me.MatchId == matchId && me.TeamId == teamId && me.TeamPlayerId == teamPlayerId).CountAsync() > 2)
                 {
                     response.Success = false;
                     response.Message = "A player cannot have more than 2 yellow cards";
@@ -104,13 +103,13 @@ namespace backend.Services.MatchEventValidation
             }
 
             var player = await _commonValidation.FindByIdAsync<Player>(teamPlayer.PlayerId);
-            response.data = new MatchEventValidationData { Event = @event, Team = team, Player = player };
+            response.data = new MatchEventValidationData { EventType = evType, Team = team, Player = player };
             return response;
         }
 
-        private async Task<bool> MatchEventAlreadyExists(int matchid, int teamid, int tpid, int eventid, int minute, int? extra_minute = null, int? id = null)
+        private async Task<bool> MatchEventAlreadyExists(int matchid, int teamid, int tpid, string eventType, int minute, int? extra_minute = null, int? id = null)
         {
-            var sameValue = _context.MatchEvents.Where(me => me.MatchId == matchid && me.TeamId == teamid && me.TeamPlayerId == tpid && me.EventId == eventid && me.Minute == minute);
+            var sameValue = _context.MatchEvents.Where(me => me.MatchId == matchid && me.TeamId == teamid && me.TeamPlayerId == tpid && me.EventType.ToString() == eventType && me.Minute == minute);
 
             if (extra_minute.HasValue)
             {

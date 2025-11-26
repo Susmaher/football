@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class @base : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,21 +27,6 @@ namespace backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Divisions", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Events",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Events", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -85,7 +70,8 @@ namespace backend.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Birth_date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,7 +107,8 @@ namespace backend.Migrations
                     Name = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Points = table.Column<int>(type: "int", nullable: false),
-                    DivisionId = table.Column<int>(type: "int", nullable: false)
+                    DivisionId = table.Column<int>(type: "int", nullable: false),
+                    FieldId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -130,6 +117,12 @@ namespace backend.Migrations
                         name: "FK_Teams_Divisions_DivisionId",
                         column: x => x.DivisionId,
                         principalTable: "Divisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Teams_Fields_FieldId",
+                        column: x => x.FieldId,
+                        principalTable: "Fields",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -141,16 +134,16 @@ namespace backend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Match_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Home_score = table.Column<int>(type: "int", nullable: false),
-                    Away_score = table.Column<int>(type: "int", nullable: false),
+                    Match_date = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Home_score = table.Column<int>(type: "int", nullable: true),
+                    Away_score = table.Column<int>(type: "int", nullable: true),
                     Round = table.Column<int>(type: "int", nullable: false),
-                    isPlayed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     HomeTeamId = table.Column<int>(type: "int", nullable: false),
                     AwayTeamId = table.Column<int>(type: "int", nullable: false),
                     DivisionId = table.Column<int>(type: "int", nullable: false),
-                    RefereeId = table.Column<int>(type: "int", nullable: false),
-                    FieldId = table.Column<int>(type: "int", nullable: false)
+                    RefereeId = table.Column<int>(type: "int", nullable: true),
+                    FieldId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -165,14 +158,12 @@ namespace backend.Migrations
                         name: "FK_Matches_Fields_FieldId",
                         column: x => x.FieldId,
                         principalTable: "Fields",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Matches_Referees_RefereeId",
                         column: x => x.RefereeId,
                         principalTable: "Referees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Matches_Teams_AwayTeamId",
                         column: x => x.AwayTeamId,
@@ -224,17 +215,13 @@ namespace backend.Migrations
                     MatchId = table.Column<int>(type: "int", nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: false),
                     TeamPlayerId = table.Column<int>(type: "int", nullable: false),
-                    EventId = table.Column<int>(type: "int", nullable: false)
+                    EventType = table.Column<int>(type: "int", nullable: false),
+                    Minute = table.Column<int>(type: "int", nullable: false),
+                    ExtraMinute = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MatchEvents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MatchEvents_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MatchEvents_Matches_MatchId",
                         column: x => x.MatchId,
@@ -263,12 +250,6 @@ namespace backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_Name",
-                table: "Events",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Matches_AwayTeamId",
                 table: "Matches",
                 column: "AwayTeamId");
@@ -292,11 +273,6 @@ namespace backend.Migrations
                 name: "IX_Matches_RefereeId",
                 table: "Matches",
                 column: "RefereeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MatchEvents_EventId",
-                table: "MatchEvents",
-                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MatchEvents_MatchId",
@@ -331,6 +307,11 @@ namespace backend.Migrations
                 column: "DivisionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Teams_FieldId",
+                table: "Teams",
+                column: "FieldId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Username",
                 table: "Users",
                 column: "Username",
@@ -347,16 +328,10 @@ namespace backend.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Events");
-
-            migrationBuilder.DropTable(
                 name: "Matches");
 
             migrationBuilder.DropTable(
                 name: "TeamPlayers");
-
-            migrationBuilder.DropTable(
-                name: "Fields");
 
             migrationBuilder.DropTable(
                 name: "Referees");
@@ -369,6 +344,9 @@ namespace backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Divisions");
+
+            migrationBuilder.DropTable(
+                name: "Fields");
         }
     }
 }

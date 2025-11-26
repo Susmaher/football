@@ -26,15 +26,16 @@ namespace backend.Controllers
 
         // GET: api/Players
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayers()
+        public async Task<ActionResult<IEnumerable<GetPlayerDto>>> GetPlayers()
         {
             var players = await _context.Players
-                .Select(p => new PlayerDto
+                .Select(p => new GetPlayerDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Birth_date = p.Birth_date,
-                    Position = p.Position
+                    PositionId = p.PositionId,
+                    PositionName = p.Position!.Name
                 }).ToListAsync();
 
             return Ok(players);
@@ -42,16 +43,17 @@ namespace backend.Controllers
 
         // GET: api/Players/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayer(int id)
+        public async Task<ActionResult<GetPlayerDto>> GetPlayer(int id)
         {
             var player = await _context.Players
                 .Where(p => p.Id == id)
-                .Select(p => new PlayerDto
+                .Select(p => new GetPlayerDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Birth_date = p.Birth_date,
-                    Position = p.Position
+                    PositionId = p.PositionId,
+                    PositionName = p.Position!.Name
                 })
                 .FirstOrDefaultAsync();
 
@@ -66,25 +68,33 @@ namespace backend.Controllers
         // PUT: api/Players/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayer(int id, PlayerDto pl)
+        public async Task<IActionResult> PutPlayer(int id, PutPlayerDto pl)
         {
             if (id != pl.Id)
             {
                 return BadRequest("Route ID and body ID do not match");
             }
-            
-            if(await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date, pl.Id))
+
+            var player = await _context.Players.FindAsync(id);
+            if (player == null)
             {
-                return BadRequest("A player with this name and birth date already exists");
+                return BadRequest("Player not found");
             }
 
-            var player = new Player
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date, pl.Id);
+            if (!validationResponse.Success)
             {
-                Id = id,
-                Name = pl.Name,
-                Birth_date = pl.Birth_date,
-                Position = pl.Position
-            };
+                return BadRequest(validationResponse.Message);
+            }
+
+            if(await _validationService.FindByIdAsync<Position>(pl.PositionId) == null)
+            {
+                return BadRequest("Position not found");
+            }
+
+            player.Name = pl.Name;
+            player.Birth_date = pl.Birth_date;
+            player.PositionId = pl.PositionId;
 
             _context.Entry(player).State = EntityState.Modified;
 
@@ -110,29 +120,37 @@ namespace backend.Controllers
         // POST: api/Players
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PlayerDto>> PostPlayer(PostPlayerDto pl)
+        public async Task<ActionResult<GetPlayerDto>> PostPlayer(PostPlayerDto pl)
         {
-            if(await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date))
-            { 
-                return BadRequest("A player with this name and birth date already exists");
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date);
+            if (!validationResponse.Success)
+            {
+                return BadRequest(validationResponse.Message);
+            }
+
+            var position = await _validationService.FindByIdAsync<Position>(pl.PositionId);
+            if (position == null)
+            {
+                return BadRequest("Position not found");
             }
 
             var player = new Player
             {
                 Name = pl.Name,
                 Birth_date = pl.Birth_date,
-                Position = pl.Position
+                PositionId = pl.PositionId,
             };
 
             _context.Players.Add(player);
             await _context.SaveChangesAsync();
 
-            var returnPlayer = new PlayerDto
+            var returnPlayer = new GetPlayerDto
             {
                 Id = player.Id,
                 Name = player.Name,
                 Birth_date = player.Birth_date,
-                Position = player.Position
+                PositionId = player.PositionId,
+                PositionName = position.Name,
             };
 
             return CreatedAtAction("GetPlayer", new { id = player.Id }, returnPlayer);

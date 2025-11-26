@@ -11,7 +11,10 @@ namespace backend.Models
         public string Name { get; set; }
         [Required]
         public DateOnly Birth_date { get; set; }
-        public string? Position { get; set; }
+        [Required]
+        public int PositionId { get; set; }
+        public Position? Position { get; set; }
+
         public TeamPlayer? TeamPlayer { get; set; }
     }
 }
