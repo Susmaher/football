@@ -87,7 +87,7 @@ namespace backend.Services.MatchEventValidation
             }
 
             //check if teamplayer belong to the team
-            if(teamPlayer.Id != team.Id)
+            if(teamPlayer.TeamId != team.Id)
             {
                 response.Success=false;
                 response.Message = "The player does not belong to the team";
@@ -95,7 +95,7 @@ namespace backend.Services.MatchEventValidation
             }
 
             //check if team is played on that match
-            if(team.Id != match.HomeTeamId || team.Id != match.AwayTeamId)
+            if(team.Id != match.HomeTeamId && team.Id != match.AwayTeamId)
             {
                 response.Success=false;
                 response.Message = "Team does not played on that match";

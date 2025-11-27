@@ -103,7 +103,7 @@ namespace backend.Controllers
 
             if (match == null)
             {
-                return NotFound();
+                return NotFound("Match not found");
             }
 
             return Ok(match);
@@ -116,13 +116,13 @@ namespace backend.Controllers
         {
             if (id != ma.Id)
             {
-                return BadRequest();
+                return BadRequest("Route ID and body ID do not match");
             }
 
             var match = await _commonValidation.FindByIdAsync<Match>(id);
             if (match == null) 
             {
-                return NotFound();
+                return NotFound("Match not found");
             }
 
             var validationResult = await _matchValidation.ValidateMatchUpdateAsync(ma);
@@ -152,7 +152,7 @@ namespace backend.Controllers
             {
                 if (await _commonValidation.FindByIdAsync<Match>(id) == null)
                 {
-                    return NotFound();
+                    return NotFound("Match not found");
                 }
                 else
                 {
@@ -218,7 +218,7 @@ namespace backend.Controllers
             var match = await _context.Matches.FindAsync(id);
             if (match == null)
             {
-                return NotFound();
+                return NotFound("Match not found");
             }
 
             var matchEvents = await _context.MatchEvents

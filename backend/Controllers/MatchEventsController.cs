@@ -92,7 +92,7 @@ namespace backend.Controllers
             var matchEvent = await _context.MatchEvents.FindAsync(id);
             if(matchEvent == null)
             {
-                return NotFound();
+                return NotFound("Match event not found");
             }
 
             var validationResult = await _matchEventValidation.ValidateMatchEventUpdateAsync(me);
@@ -118,7 +118,7 @@ namespace backend.Controllers
             {
                 if (await _commonValidation.FindByIdAsync<MatchEvent>(id) == null)
                 {
-                    return NotFound();
+                    return NotFound("Match event not found");
                 }
                 else
                 {
@@ -176,7 +176,7 @@ namespace backend.Controllers
             var matchEvent = await _context.MatchEvents.FindAsync(id);
             if (matchEvent == null)
             {
-                return NotFound();
+                return NotFound("Match event not found");
             }
 
             _context.MatchEvents.Remove(matchEvent);

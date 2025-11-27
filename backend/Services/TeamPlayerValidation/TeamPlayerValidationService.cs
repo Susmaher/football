@@ -19,16 +19,10 @@ namespace backend.Services.TeamPlayerValidation
 
         public async Task<ServiceResponse<TeamPlayerValidationData>> ValidateTeamPlayerCreationAsync(PostTeamPlayerDto teamPlayerDto)
         {
-            //checks if the player is already in the team
+            //checks if the player is already assigned to a team
             if (await TeamPlayerAlreadyExists(teamPlayerDto.TeamId, teamPlayerDto.PlayerId))
             {
-                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already in the Team" };
-            }
-
-            //checks if the player is already in another team
-            if (await _context.TeamPlayers.AnyAsync(tp => tp.PlayerId == teamPlayerDto.PlayerId))
-            {
-                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already assigned to another team." };
+                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already assigned to a team" };
             }
 
             return await ValidateCommonTeamPlayerRulesAsync(teamPlayerDto.TeamId, teamPlayerDto.PlayerId);
@@ -36,16 +30,10 @@ namespace backend.Services.TeamPlayerValidation
 
         public async Task<ServiceResponse<TeamPlayerValidationData>> ValidateTeamPlayerUpdateAsync(PutTeamPlayerDto teamPlayerDto)
         {
-            //checks if the player is already in the team
+            //checks if the player is already assigned to a team
             if (await TeamPlayerAlreadyExists(teamPlayerDto.TeamId, teamPlayerDto.PlayerId, teamPlayerDto.Id))
             {
-                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already in the Team" };
-            }
-
-            //checks if the player is already in another team
-            if (await _context.TeamPlayers.AnyAsync(tp => tp.PlayerId == teamPlayerDto.PlayerId && tp.Id != teamPlayerDto.Id))
-            {
-                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already assigned to another team." };
+                return new ServiceResponse<TeamPlayerValidationData> { Success = false, Message = "This player is already assigned to a team" };
             }
 
             return await ValidateCommonTeamPlayerRulesAsync(teamPlayerDto.TeamId, teamPlayerDto.PlayerId);
@@ -60,7 +48,7 @@ namespace backend.Services.TeamPlayerValidation
             if (team == null)
             {
                 response.Success = false;
-                response.Message = "Team does not exist";
+                response.Message = "Team not found";
                 return response;
             }
 
@@ -80,7 +68,7 @@ namespace backend.Services.TeamPlayerValidation
         }
         private async Task<bool> TeamPlayerAlreadyExists(int teamId, int playerId, int? id = null)
         {
-            var sameValue = _context.TeamPlayers.Where(tp => tp.TeamId == teamId && tp.PlayerId == playerId);
+            var sameValue = _context.TeamPlayers.Where(tp => tp.PlayerId == playerId);
 
             if (id.HasValue)
             {
