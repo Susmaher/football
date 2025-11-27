@@ -62,7 +62,7 @@ namespace backend.Controllers
 
             if (teamPlayer == null)
             {
-                return NotFound();
+                return NotFound("Teamplayer not found");
             }
 
             return teamPlayer;
@@ -81,7 +81,7 @@ namespace backend.Controllers
             var teamPlayer = await _context.TeamPlayers.FindAsync(id);
             if (teamPlayer == null)
             {
-                return NotFound();
+                return NotFound("Teamplayer not found");
             }
 
             var validationResult = await _teamPlayerValidation.ValidateTeamPlayerUpdateAsync(tmpl);
@@ -104,7 +104,7 @@ namespace backend.Controllers
             {
                 if (await _commonValidation.FindByIdAsync<TeamPlayer>(id) == null)
                 {
-                    return NotFound();
+                    return NotFound("Teamplayer not found");
                 }
                 else
                 {
@@ -154,7 +154,7 @@ namespace backend.Controllers
             var teamPlayer = await _context.TeamPlayers.FindAsync(id);
             if (teamPlayer == null)
             {
-                return NotFound();
+                return NotFound("Teamplayer not found");
             }
 
             //if a player has matchevent, it cannot be deleted

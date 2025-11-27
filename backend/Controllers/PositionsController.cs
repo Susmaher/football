@@ -63,11 +63,11 @@ namespace backend.Controllers
         // PUT: api/Positions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPosition(int id, Position po)
+        public async Task<IActionResult> PutPosition(int id, PositionDto po)
         {
             if (id != po.Id)
             {
-                return BadRequest();
+                return BadRequest("Route ID and body ID do not match");
             }
 
             var position = await _context.Positions.FindAsync(id);
@@ -107,7 +107,7 @@ namespace backend.Controllers
         // POST: api/Positions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PositionDto>> PostPosition(Position po)
+        public async Task<ActionResult<PositionDto>> PostPosition(PostPositionDto po)
         {
             if(await _validationService.NameExistsAsync<Position>(po.Name))
             {

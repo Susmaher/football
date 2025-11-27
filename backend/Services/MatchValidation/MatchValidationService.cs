@@ -23,7 +23,7 @@ namespace backend.Services.MatchValidation
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
 
-            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId);
+            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId, matchDto.Match_date);
         }
 
         public async Task<ServiceResponse<MatchValidationData>> ValidateMatchUpdateAsync(PutMatchDto matchDto)
@@ -33,10 +33,10 @@ namespace backend.Services.MatchValidation
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
 
-            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId);
+            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId, matchDto.Match_date);
         }
 
-        private async Task<ServiceResponse<MatchValidationData>> ValidateCommonMatchRulesAsync(string status, int divisionId, int AwayTeamId, int HomeTeamId, int? homeScore = null, int? awayScore = null, int? fieldId = null, int? refereeId = null)
+        private async Task<ServiceResponse<MatchValidationData>> ValidateCommonMatchRulesAsync(string status, int divisionId, int AwayTeamId, int HomeTeamId, int round, int? homeScore = null, int? awayScore = null, int? fieldId = null, int? refereeId = null, DateTime? date = null)
         {
             var response = new ServiceResponse<MatchValidationData>();
 
@@ -92,6 +92,22 @@ namespace backend.Services.MatchValidation
                     response.Message = "Referee does not exist";
                     return response;
                 }
+            }
+
+            //check if datum is valid (played match cannot be in the future)
+            if(date.HasValue && stat == MatchStatus.Played && date > DateTime.UtcNow)
+            {
+                response.Success = false;
+                response.Message = "A played match cannot be in the future";
+                return response;
+            }
+
+            //check if round is valid
+            if(round <= 0)
+            {
+                response.Success = false;
+                response.Message = "Round cannot be a negative number";
+                return response;
             }
 
             //if the match is not completed, scores must have null value

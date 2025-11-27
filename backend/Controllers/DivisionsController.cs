@@ -96,17 +96,19 @@ namespace backend.Controllers
                 return BadRequest("Route ID and body ID do not match");
             }
 
+            var division = await _context.Divisions.FindAsync(id);
+            if (division == null)
+            {
+                return NotFound("Division not found");
+            }
+
             //validate whether name exists
             if (await _validationService.NameExistsAsync<Division>(divisiondto.Name, divisiondto.Id))
             {
                 return BadRequest("A division with this name already exists");
             }
 
-            var division = new Division
-            { 
-                Id = id,
-                Name = divisiondto.Name,
-            };
+            division.Name = divisiondto.Name;
 
             _context.Entry(division).State = EntityState.Modified;
 
