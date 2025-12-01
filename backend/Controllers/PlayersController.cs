@@ -25,11 +25,24 @@ namespace backend.Controllers
             _validationService = validationService;
         }
 
+        // GET: api/Players?position=1
         // GET: api/Players
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetPlayerDto>>> GetPlayers()
+        public async Task<ActionResult<IEnumerable<GetPlayerDto>>> GetPlayers([FromQuery] int? position = null)
         {
-            var players = await _context.Players
+            var query = _context.Players.AsQueryable();
+
+            if (position.HasValue)
+            {
+                if(await _validationService.FindByIdAsync<Position>(position.Value) == null)
+                {
+                    return BadRequest("Position not found");
+                }
+
+                query = query.Where(p => p.PositionId == position);
+            }
+
+            var players = await query
                 .Select(p => new GetPlayerDto
                 {
                     Id = p.Id,
@@ -188,7 +201,7 @@ namespace backend.Controllers
             var player = await _context.Players.FindAsync(id);
             if (player == null)
             {
-                return NotFound();
+                return NotFound("Player not found");
             }
 
             //if a player is deleted, then also the teamplayer is deleted

@@ -27,11 +27,23 @@ namespace backend.Controllers
             _teamPlayerValidation = teamPlayerValidation;
         }
 
+        // GET: api/Teamplayers?team=1
         // GET: api/TeamPlayers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetTeamPlayerDto>>> GetTeamPlayers()
+        public async Task<ActionResult<IEnumerable<GetTeamPlayerDto>>> GetTeamPlayers([FromQuery] int? team = null)
         {
-            var teamplayer = await _context.TeamPlayers
+            var query = _context.TeamPlayers.AsQueryable();
+
+            if (team.HasValue)
+            {
+                if(await _commonValidation.FindByIdAsync<Team>(team.Value) == null)
+                {
+                    return BadRequest("Team not found");
+                }
+                query = query.Where(tp => tp.TeamId == team.Value);
+            }
+
+            var teamplayer = await query
                 .Select(tp => new GetTeamPlayerDto
                 {
                     Id = tp.Id,

@@ -28,18 +28,43 @@ namespace backend.Controllers
             _matchValidation = matchValidation;
         }
 
-        // GET: api/Matches
-        [HttpGet("played-matches")]
-        public async Task<ActionResult<IEnumerable<GetMatchDto>>> GetPlayedMatches()
+        //GET: api/Matches?played=true
+        //GET: api/Matches?played=false
+        //GET: api/Matches
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GetMatchDto>>> GetMatches([FromQuery] bool? played = null, [FromQuery] int? divison = null, [FromQuery] int? round = null)
         {
-            var matches = await _context.Matches
-                .Where(m => m.Status == MatchStatus.Played)
+            var query = _context.Matches.AsQueryable();
+
+            if(played == true)
+            {
+                query = query.Where(m => m.Status == MatchStatus.Played);
+            } else if (played == false)
+            {
+                query = query.Where(m => m.Status != MatchStatus.Played);
+            }
+
+            if (divison.HasValue)
+            {
+                if(await _commonValidation.FindByIdAsync<Division>(divison.Value) == null)
+                {
+                    return BadRequest("Division not found");
+                }
+                query = query.Where(m => m.DivisionId == divison.Value);
+            }
+
+            if (round.HasValue)
+            {
+                query = query.Where(m => m.Round == round.Value);
+            }
+
+            var matches = await query
                 .Select(m => new GetMatchDto
                 {
                     Id = m.Id,
                     Match_date = m.Match_date,
-                    Home_score = m.Home_score,
-                    Away_score = m.Away_score,
+                    Home_score = m.Status == MatchStatus.Played ? m.Home_score : null,
+                    Away_score = m.Status == MatchStatus.Played ? m.Away_score : null,
                     Round = m.Round,
                     Status = m.Status.ToString(),
                     HomeTeamId = m.HomeTeamId,
@@ -48,30 +73,8 @@ namespace backend.Controllers
                     AwayTeamName = m.AwayTeam!.Name,
                     DivisionId = m.DivisionId,
                     DivisionName = m.Division!.Name,
-                    RefereeName = m.Referee!.Name,
-                    FieldName = m.Field!.Name,
-                }).ToListAsync();
-
-            return Ok(matches);
-        }
-
-        [HttpGet("non-played-matches")]
-        public async Task<ActionResult<IEnumerable<GetMatchDto>>> GetNonPlayedMatches()
-        {
-            var matches = await _context.Matches
-                .Where(m => m.Status != MatchStatus.Played)
-                .Select(m => new GetMatchDto
-                {
-                    Id = m.Id,
-                    Match_date = m.Match_date,
-                    Round = m.Round,
-                    Status = m.Status.ToString(),
-                    HomeTeamId = m.HomeTeamId,
-                    HomeTeamName = m.HomeTeam!.Name,
-                    AwayTeamId = m.AwayTeamId,
-                    AwayTeamName = m.AwayTeam!.Name,
-                    DivisionId = m.DivisionId,
-                    DivisionName = m.Division!.Name,
+                    RefereeName = m.Status == MatchStatus.Played ? m.Referee!.Name : null,
+                    FieldName = m.Status == MatchStatus.Played ? m.Field!.Name : null,
                 }).ToListAsync();
 
             return Ok(matches);

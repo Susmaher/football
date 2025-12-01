@@ -93,7 +93,7 @@ namespace backend.Controllers
             {
                 if (await _validationService.FindByIdAsync<Position>(id) == null)
                 {
-                    return NotFound();
+                    return NotFound("Position not found");
                 }
                 else
                 {

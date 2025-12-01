@@ -30,11 +30,24 @@ namespace backend.Controllers
             _commonValidationService = commonValidationService;
         }
 
+        // GET: api/Teams?division=1
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetTeamsDto>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<GetTeamsDto>>> GetTeams([FromQuery] int? division = null)
         {
-            var teams = await _context.Teams
+            var query = _context.Teams.AsQueryable();
+
+            if (division.HasValue)
+            {
+                if (await _commonValidationService.FindByIdAsync<Division>(division.Value) == null)
+                {
+                    return BadRequest("Division not found");
+                }
+
+                query = query.Where(t => t.DivisionId == division);
+            }
+
+            var teams = await query
                 .Select(t => new GetTeamsDto
                 {
                     Id = t.Id,
@@ -73,30 +86,6 @@ namespace backend.Controllers
             }
 
             return Ok(team);
-        }
-
-        // GET: api/Teams/5/players
-        [HttpGet("{id}/players")]
-        public async Task<ActionResult<IEnumerable<GetTeamPlayerDto>>> GetTeamPlayersInTeam(int id)
-        {
-            if(await _commonValidationService.FindByIdAsync<Team>(id) == null)
-            {
-                return NotFound("Team not found");
-            }
-
-            var teamPlayers = await _context.TeamPlayers
-                .Where(tp=>tp.TeamId==id)
-                .Select(tp => new GetTeamPlayerDto
-                {
-                    Id = tp.Id,
-                    TeamId = tp.TeamId,
-                    TeamName = tp.Team!.Name,
-                    PlayerId = tp.PlayerId,
-                    PlayerName = tp.Player!.Name
-                })
-                .ToListAsync();
-
-            return Ok(teamPlayers);
         }
 
         // PUT: api/Teams/5

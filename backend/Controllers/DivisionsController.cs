@@ -61,31 +61,6 @@ namespace backend.Controllers
             return division;
         }
 
-        // GET: api/Divisions/5/teams
-        [HttpGet("{id}/teams")]
-        public async Task<ActionResult<GetTeamsDto>> GetTeamsInDivision(int id)
-        {
-            if(await _validationService.FindByIdAsync<Division>(id) == null)
-            {
-                return NotFound("Division not found");
-            }
-
-            var teams = await _context.Teams
-                .Where(t=> t.DivisionId == id)
-                .Select(t=> new GetTeamsDto
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Points = t.Points,
-                    DivisionId = t.DivisionId,
-                    DivisionName = t.Division!.Name,
-                    FieldId = t.FieldId,
-                    FieldName = t.Field!.Name,
-                }).ToListAsync();
-
-            return Ok(teams);
-        }
-
         // PUT: api/Divisions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
