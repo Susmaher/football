@@ -11,6 +11,8 @@ function Home(): JSX.Element {
             </p>
             <Link to="/teams">Teams</Link>
             <Link to="/matches">Matches</Link>
+            <br />
+            <Link to="/admin">Admin</Link>
         </>
     );
 }
