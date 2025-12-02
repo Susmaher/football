@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -237,6 +238,60 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+
+
+
+
+        //---------------------------------------------------------------------------------------------------------------------------//
+        // GET: draw
+        [HttpGet("preview/{division}")]
+        public async Task<ActionResult<IEnumerable<GetMatchDto>>> DrawMatches(int division)
+        {
+            var teams = await _context.Teams.Where(t=>t.DivisionId == division).ToListAsync();
+            var team_count = teams.Count();
+            var matches = new List<GetMatchDto>();
+
+            if (team_count % 2 == 0)
+            {
+                teams.Add(new Team { Id = 0, Name="DummyBot", Points = -1, DivisionId = -1, FieldId = -1 }); 
+            }
+
+
+            int rounds = team_count % 2 == 0 ? team_count : team_count + 1;
+            for (int i = 1; i < rounds; i++)
+            {
+                int t_max = team_count;
+                for (int j = 0; j < team_count / 2; j++)
+                {
+                    var match = new GetMatchDto
+                    {
+                        Round = i,
+                        Status = "Scheduled",
+                        DivisionId = division,
+                        HomeTeamId = teams[j].Id,
+                        HomeTeamName = teams[j].Name,
+                        AwayTeamId = teams[t_max - 1].Id,
+                        AwayTeamName = teams[t_max - 1].Name,
+                    };
+                    t_max--;
+                    if(match.HomeTeamId == 0 || match.AwayTeamId == 0)
+                    {
+                        continue;
+                    }
+                    matches.Add(match);
+                }
+
+                var temp = teams[team_count - 1];
+                for (int j = team_count - 1; j > 0; j--)
+                {
+                    teams[j] = teams[j - 1];
+                }
+                teams[1] = temp;
+            }
+
+            return Ok(matches);
         }
     }
 }
