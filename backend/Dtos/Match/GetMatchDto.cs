@@ -17,7 +17,9 @@ namespace backend.Dtos.Match
         public string AwayTeamName { get; set; }
         public int DivisionId { get; set; }
         public string DivisionName { get; set; }
+        public int? RefereeId { get; set; }
         public string? RefereeName { get; set; }
+        public int? FieldId { get; set; }
         public string? FieldName { get; set; }
     }
 }

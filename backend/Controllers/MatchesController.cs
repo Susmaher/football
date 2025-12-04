@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using backend.Context;
@@ -74,8 +75,10 @@ namespace backend.Controllers
                     AwayTeamName = m.AwayTeam!.Name,
                     DivisionId = m.DivisionId,
                     DivisionName = m.Division!.Name,
-                    RefereeName = m.Status == MatchStatus.Played ? m.Referee!.Name : null,
-                    FieldName = m.Status == MatchStatus.Played ? m.Field!.Name : null,
+                    RefereeId = m.Referee != null ? m.Referee!.Id : null,
+                    RefereeName = m.Referee != null ? m.Referee!.Name : null,
+                    FieldId = m.Field != null ? m.Field!.Id : null,
+                    FieldName = m.Field != null ? m.Field!.Name : null,
                 }).ToListAsync();
 
             return Ok(matches);
@@ -101,8 +104,10 @@ namespace backend.Controllers
                     AwayTeamName = m.AwayTeam!.Name,
                     DivisionId = m.DivisionId,
                     DivisionName = m.Division!.Name,
-                    RefereeName = m.Status == MatchStatus.Played ? m.Referee!.Name : null,
-                    FieldName = m.Status == MatchStatus.Played ? m.Field!.Name : null,
+                    RefereeId = m.Referee != null ? m.Referee!.Id : null,
+                    RefereeName = m.Referee != null ? m.Referee!.Name : null,
+                    FieldId = m.Field != null ? m.Field!.Id : null,
+                    FieldName = m.Field != null ? m.Field!.Name : null,
                 }).FirstOrDefaultAsync();
 
             if (match == null)
@@ -208,8 +213,10 @@ namespace backend.Controllers
                 AwayTeamName = validationResult.data.AwayTeam!.Name,
                 DivisionId = match.DivisionId,
                 DivisionName = validationResult.data.Division!.Name,
-                RefereeName = validationResult.data!.Status == MatchStatus.Played ? validationResult.data.Referee!.Name : null,
-                FieldName = validationResult.data!.Status == MatchStatus.Played ? validationResult.data.Field!.Name : null,
+                RefereeId = validationResult.data!.Referee != null ? validationResult.data.Referee!.Id : null,
+                RefereeName = validationResult.data!.Referee != null ? validationResult.data.Referee!.Name : null,
+                FieldId = validationResult.data!.Field != null ? validationResult.data.Field!.Id : null,
+                FieldName = validationResult.data!.Field != null ? validationResult.data.Field!.Name : null,
             };
 
             return CreatedAtAction("GetMatch", new { id = match.Id }, returnMatch);
@@ -246,41 +253,64 @@ namespace backend.Controllers
 
         //---------------------------------------------------------------------------------------------------------------------------//
         // GET: draw
-        [HttpGet("preview/{division}")]
+        [HttpGet("draw/preview/{division}")]
         public async Task<ActionResult<IEnumerable<GetMatchDto>>> DrawMatches(int division)
         {
-            var teams = await _context.Teams.Where(t=>t.DivisionId == division).ToListAsync();
-            var team_count = teams.Count();
-            var matches = new List<GetMatchDto>();
+            var teams = await _context.Teams.Where(t=>t.DivisionId == division).Include(t=>t.Field).ToListAsync();
+            var home_matches = new List<GetMatchDto>();
 
-            if (team_count % 2 == 0)
+            //double round-robin algorithm
+            //rounds: teams%2==0 ? teams.Count()-1 : teams.Count()
+            int rounds = teams.Count()-1;
+            if (teams.Count() % 2 != 0)
             {
-                teams.Add(new Team { Id = 0, Name="DummyBot", Points = -1, DivisionId = -1, FieldId = -1 }); 
+                teams.Add(new Team { Id = 0, Name="DummyBot", Points = -1, DivisionId = -1, FieldId = -1 });
+                rounds++;
             }
 
-
-            int rounds = team_count % 2 == 0 ? team_count : team_count + 1;
-            for (int i = 1; i < rounds; i++)
+            Random rndmain = new();
+            int n = teams.Count();
+            while (n > 1)
             {
-                int t_max = team_count;
+                n--;
+                int k = rndmain.Next(n + 1);
+                var value = teams[k];
+                teams[k] = teams[n];
+                teams[n] = value;
+            }
+
+            var referees = await _context.Referees.ToListAsync();
+
+            var team_count = teams.Count();
+            for (int i = 1; i <= rounds; i++)
+            {
+                int t_max = team_count-1;
                 for (int j = 0; j < team_count / 2; j++)
                 {
-                    var match = new GetMatchDto
+                    var first_team_match_count = home_matches.Where(t => t.HomeTeamId == teams[j].Id).Count();
+                    var second_team_match_count = home_matches.Where(t => t.HomeTeamId == teams[t_max].Id).Count();
+                    var rand = new Random();
+                    var referee = referees[rand.Next(referees.Count())];
+                    var home_match = new GetMatchDto
                     {
                         Round = i,
                         Status = "Scheduled",
                         DivisionId = division,
-                        HomeTeamId = teams[j].Id,
-                        HomeTeamName = teams[j].Name,
-                        AwayTeamId = teams[t_max - 1].Id,
-                        AwayTeamName = teams[t_max - 1].Name,
+                        HomeTeamId = first_team_match_count <= second_team_match_count ? teams[j].Id : teams[t_max].Id,
+                        HomeTeamName = first_team_match_count <= second_team_match_count ? teams[j].Name : teams[t_max].Name,
+                        AwayTeamId = first_team_match_count <= second_team_match_count ? teams[t_max].Id : teams[j].Id,
+                        AwayTeamName = first_team_match_count <= second_team_match_count ? teams[t_max].Name : teams[j].Name,
+                        RefereeId = referee.Id,
+                        RefereeName = referee.Name,
                     };
                     t_max--;
-                    if(match.HomeTeamId == 0 || match.AwayTeamId == 0)
+                    if(home_match.HomeTeamId == 0 || home_match.AwayTeamId == 0)
                     {
                         continue;
                     }
-                    matches.Add(match);
+                    home_match.FieldName = teams.Where(t => t.Id == home_match.HomeTeamId).Select(t => t.Field!.Name).FirstOrDefault();
+
+                    home_matches.Add(home_match);
                 }
 
                 var temp = teams[team_count - 1];
@@ -290,6 +320,27 @@ namespace backend.Controllers
                 }
                 teams[1] = temp;
             }
+
+            //double part
+            var away_matches = new List<GetMatchDto>();
+            foreach (var match in home_matches)
+            {
+                var away_match = new GetMatchDto
+                {
+                    Round = match.Round+rounds,
+                    Status = "Scheduled",
+                    DivisionId = division,
+                    HomeTeamId = match.AwayTeamId,
+                    HomeTeamName = match.AwayTeamName,
+                    AwayTeamId = match.HomeTeamId,
+                    AwayTeamName = match.HomeTeamName,
+                    FieldName = teams.FirstOrDefault(t=>t.Id == match.AwayTeamId)?.Field?.Name,
+                };
+                away_matches.Add(away_match);
+            }
+
+            
+            List<GetMatchDto> matches = [..home_matches, ..away_matches];
 
             return Ok(matches);
         }
