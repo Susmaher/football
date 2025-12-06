@@ -103,7 +103,7 @@ namespace backend.Services.MatchValidation
             }
 
             //check if round is valid
-            if(round <= 0)
+            if(round < 0)
             {
                 response.Success = false;
                 response.Message = "Round cannot be a negative number";

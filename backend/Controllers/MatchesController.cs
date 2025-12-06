@@ -256,7 +256,12 @@ namespace backend.Controllers
         [HttpGet("draw/preview/{division}")]
         public async Task<ActionResult<IEnumerable<GetMatchDto>>> DrawMatches(int division)
         {
-            var teams = await _context.Teams.Where(t=>t.DivisionId == division).Include(t=>t.Field).ToListAsync();
+            if(await _commonValidation.FindByIdAsync<Division>(division) == null)
+            {
+                return NotFound("Divison not found");
+            }
+            var teams = await _context.Teams.Where(t => t.DivisionId == division).Include(t => t.Field).ToListAsync();
+
             var home_matches = new List<GetMatchDto>();
 
             //double round-robin algorithm
@@ -325,6 +330,8 @@ namespace backend.Controllers
             var away_matches = new List<GetMatchDto>();
             foreach (var match in home_matches)
             {
+                var rand = new Random();
+                var referee = referees[rand.Next(referees.Count())];
                 var away_match = new GetMatchDto
                 {
                     Round = match.Round+rounds,
@@ -334,6 +341,8 @@ namespace backend.Controllers
                     HomeTeamName = match.AwayTeamName,
                     AwayTeamId = match.HomeTeamId,
                     AwayTeamName = match.HomeTeamName,
+                    RefereeId = referee.Id,
+                    RefereeName = referee.Name,
                     FieldName = teams.FirstOrDefault(t=>t.Id == match.AwayTeamId)?.Field?.Name,
                 };
                 away_matches.Add(away_match);

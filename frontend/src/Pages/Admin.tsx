@@ -1,6 +1,6 @@
 import type { JSX } from "react";
-import Draw from "./AdminChildPages/Draw";
 import SideBar from "../components/AdminComponents/SideBar";
+import { Outlet } from "react-router-dom";
 
 function Admin(): JSX.Element {
     return (
@@ -10,7 +10,7 @@ function Admin(): JSX.Element {
             </div>
             <div>
                 <h1>Ez itt az admin page. Használd egészséggel</h1>
-                <Draw />
+                <Outlet />
             </div>
         </>
     );
