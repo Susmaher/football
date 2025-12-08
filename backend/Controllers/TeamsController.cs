@@ -88,6 +88,15 @@ namespace backend.Controllers
             return Ok(team);
         }
 
+        //GET: api/Teams/admin
+        [HttpGet("admin")]
+        public async Task<ActionResult<GetTeamsDto>> GetTeamsForAdminPage()
+        {
+            var fields = await _context.Fields.ToListAsync();
+            var divisions = await _context.Divisions.ToListAsync();
+            return Ok();
+        }
+
         // PUT: api/Teams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -192,7 +201,7 @@ namespace backend.Controllers
             var team = new Team
             {
                 Name=tm.Name,
-                Points = tm.Points ?? 0,
+                Points = 0,
                 DivisionId = tm.DivisionId,
                 FieldId = tm.FieldId,
             }; 

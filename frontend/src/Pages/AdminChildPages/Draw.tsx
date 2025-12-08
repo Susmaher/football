@@ -1,24 +1,6 @@
 import { useEffect, useState, type JSX } from "react";
 import api from "../../services/api";
-
-interface MatchData {
-    match_date: string;
-    round: string;
-    status: string;
-    homeTeamId: string;
-    homeTeamName: string;
-    awayTeamId: string;
-    awayTeamName: string;
-    divisionId: string;
-    divisionName: string;
-    refereeName: string | null;
-    fieldName: string | null;
-}
-
-interface DivisionData {
-    id: string;
-    name: string;
-}
+import type { MatchData, DivisionData } from "../../types/interfaces";
 
 function Draw(): JSX.Element {
     const [matches, setMatches] = useState<MatchData[]>([]);
