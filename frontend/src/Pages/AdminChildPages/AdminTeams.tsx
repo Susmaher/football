@@ -1,21 +1,18 @@
-import { useEffect, useState, type JSX } from "react";
-import api from "../../services/api";
+import { useState, type JSX } from "react";
 import AddTeam from "../../components/AdminComponents/teamcomp/AddTeam";
-
-interface TeamData {
-    id: string;
-    name: string;
-    points: string;
-    divisionId: string;
-    divisionName: string;
-    fieldId: string;
-    fieldName: string;
-}
-
-//needed fields and divisions
+import ModifyTeam from "../../components/AdminComponents/teamcomp/ModifyTeam";
 
 function AdminTeams(): JSX.Element {
-    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [selectedForm, setSelectedForm] = useState<string | null>(null);
+
+    const handleClick = (form: string) => {
+        if (form == "add") {
+            setSelectedForm("add");
+        } else {
+            setSelectedForm("modify");
+        }
+    };
+
     return (
         <>
             <h1>
@@ -23,33 +20,16 @@ function AdminTeams(): JSX.Element {
                 szépen
             </h1>
 
-            {isVisible && <AddTeam />}
-
-            <button onClick={() => setIsVisible(true)}>
+            <button onClick={() => handleClick("add")}>
                 Csapat hozzáadása
             </button>
-            <button>Csapat módosítása</button>
+            <button onClick={() => handleClick("modify")}>
+                Csapat módosítása
+            </button>
+
+            {selectedForm == "modify" && <ModifyTeam />}
+            {selectedForm == "add" && <AddTeam />}
         </>
     );
 }
 export default AdminTeams;
-
-/*<label>
-                Válassz csapatot:
-                {teams ? (
-                    <select
-                        value={selectedTeam}
-                        onChange={(e) => setSelectedTeam(e.target.value)}
-                        id="division-pick"
-                    >
-                        {teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                                {team.name}
-                            </option>
-                        ))}
-                    </select>
-                ) : (
-                    <p>Loading...</p>
-                )}
-            </label>
-            <br /> */

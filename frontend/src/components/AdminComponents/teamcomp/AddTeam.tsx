@@ -1,58 +1,39 @@
-import { useEffect, useState, type JSX } from "react";
-import type { DivisionData, FieldData } from "../../../types/interfaces";
-import api from "../../../services/api";
+import { type JSX } from "react";
 import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
-
-interface CreateTeamInputs {
-    name: string;
-    divisionId: number;
-    fieldId: number;
-}
+import { useFields } from "../../../hooks/FieldHook";
+import { useDivisions } from "../../../hooks/DivisionHook";
+import { useCreateTeam } from "../../../hooks/TeamHook";
+import type {
+    CreateTeamInputs,
+    DivisionData,
+    FieldData,
+} from "../../../types/interfaces";
 
 function AddTeam(): JSX.Element {
-    const [divisions, setDivisions] = useState<DivisionData[]>([]);
-    const [fields, setFields] = useState<FieldData[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const { data: fields } = useFields();
+    const { data: divisions, isLoading } = useDivisions();
 
-    const fetchFieldsAndDivisions = async () => {
-        const divisionrespone = await api.get("Divisions");
-        setDivisions(divisionrespone.data);
-        const fieldrespone = await api.get("Fields");
-        setFields(fieldrespone.data);
-    };
+    const createTeam = useCreateTeam();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            await fetchFieldsAndDivisions();
-        };
-        fetchData();
-    }, []);
+    const { register, handleSubmit } = useForm<CreateTeamInputs>();
 
-    const { register, handleSubmit, reset } = useForm<CreateTeamInputs>();
-
-    async function createTeam(data: CreateTeamInputs) {
+    async function onSubmit(data: CreateTeamInputs) {
         try {
-            setLoading(true);
-            await api.post("Teams", {
-                name: data.name,
-                divisionId: data.divisionId,
-                fieldId: data.fieldId,
-            });
-            reset();
+            console.log(data);
+            await createTeam.mutateAsync(data);
         } catch (error) {
             if (error instanceof AxiosError) {
-                setError(`Error: ${error.response?.data}`);
+                console.log(error);
             }
-        } finally {
-            setLoading(false);
         }
     }
 
+    if (isLoading) return <div>Loading...</div>;
+
     return (
         <div>
-            <form onSubmit={handleSubmit(createTeam)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <label>
                     Válassz osztályt:
                     {divisions ? (
@@ -65,7 +46,7 @@ function AddTeam(): JSX.Element {
                             <option value="" disabled>
                                 -- Válassz osztályt --
                             </option>
-                            {divisions.map((division) => (
+                            {divisions.map((division: DivisionData) => (
                                 <option key={division.id} value={division.id}>
                                     {division.name}
                                 </option>
@@ -88,7 +69,7 @@ function AddTeam(): JSX.Element {
                             <option value="" disabled>
                                 -- Válassz pályát --
                             </option>
-                            {fields.map((field) => (
+                            {fields.map((field: FieldData) => (
                                 <option key={field.id} value={field.id}>
                                     {field.name}
                                 </option>
@@ -114,10 +95,7 @@ function AddTeam(): JSX.Element {
                         })}
                     />
                 </label>
-                {error && <span>{error}</span>}
-                <button disabled={loading} type="submit">
-                    Csapat hozzáadása
-                </button>
+                <button type="submit">Csapat hozzáadása</button>
             </form>
         </div>
     );
