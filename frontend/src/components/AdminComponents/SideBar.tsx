@@ -19,6 +19,8 @@ function SideBar(): JSX.Element {
             >
                 <Link to="draw">Sorsolás</Link>
                 <Link to="teams">Csapatok koordinálása</Link>
+                <Link to="divisions">Osztályok koordinálása</Link>
+                <Link to="fields">Pályák koordinálása</Link>
             </nav>
         </div>
     );

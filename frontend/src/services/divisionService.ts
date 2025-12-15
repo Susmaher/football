@@ -5,7 +5,7 @@ import type {
 import api from "./api";
 
 const DivisionService = {
-    getAll: () => api.get("Divisions"),
+    getAll: () => api.get<DivisionData[]>("Divisions"),
     getById: (id: number) => api.get<DivisionData>(`Divisions/${id}`),
     create: (division: CreateDivisionAndFieldData) =>
         api.post<DivisionData>("Divisions", division),

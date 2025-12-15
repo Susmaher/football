@@ -5,7 +5,7 @@ import type {
 import api from "./api";
 
 const FieldService = {
-    getAll: () => api.get("Fields"),
+    getAll: () => api.get<FieldData[]>("Fields"),
     getById: (id: number) => api.get<FieldData>(`Fields/${id}`),
     create: (field: CreateDivisionAndFieldData) =>
         api.post<FieldData>("Fields", field),

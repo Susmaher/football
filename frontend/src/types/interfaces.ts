@@ -13,7 +13,7 @@ export interface MatchData {
 }
 
 export interface DivisionData {
-    id: string;
+    id: number;
     name: string;
 }
 
@@ -22,12 +22,12 @@ export interface CreateDivisionAndFieldData {
 }
 
 export interface FieldData {
-    id: string;
+    id: number;
     name: string;
 }
 
 export interface TeamData {
-    id: string;
+    id: number;
     name: string;
     points: string;
     divisionId: string;
@@ -37,7 +37,7 @@ export interface TeamData {
 }
 
 export interface CreateTeamInputs {
-    name: string;
+    name: number;
     divisionId: number;
     fieldId: number;
 }
@@ -48,4 +48,8 @@ export interface ModifyTeamInputs {
     divisionId: number;
     fieldId: number;
     points: number;
+}
+
+export interface DeleteInput {
+    id: number;
 }

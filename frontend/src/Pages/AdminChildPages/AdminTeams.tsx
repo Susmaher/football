@@ -1,6 +1,7 @@
 import { useState, type JSX } from "react";
 import AddTeam from "../../components/AdminComponents/teamcomp/AddTeam";
 import ModifyTeam from "../../components/AdminComponents/teamcomp/ModifyTeam";
+import DeleteTeam from "../../components/AdminComponents/teamcomp/DeleteTeam";
 
 function AdminTeams(): JSX.Element {
     const [selectedForm, setSelectedForm] = useState<string | null>(null);
@@ -8,8 +9,10 @@ function AdminTeams(): JSX.Element {
     const handleClick = (form: string) => {
         if (form == "add") {
             setSelectedForm("add");
-        } else {
+        } else if (form == "modify") {
             setSelectedForm("modify");
+        } else {
+            setSelectedForm("delete");
         }
     };
 
@@ -26,9 +29,13 @@ function AdminTeams(): JSX.Element {
             <button onClick={() => handleClick("modify")}>
                 Csapat módosítása
             </button>
+            <button onClick={() => handleClick("delete")}>
+                Csapat törlése
+            </button>
 
             {selectedForm == "modify" && <ModifyTeam />}
             {selectedForm == "add" && <AddTeam />}
+            {selectedForm == "delete" && <DeleteTeam />}
         </>
     );
 }

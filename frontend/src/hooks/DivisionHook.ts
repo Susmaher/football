@@ -43,3 +43,14 @@ export const useModifyDivision = () => {
         },
     });
 };
+
+export const useDeleteDivision = () => {
+    const QueryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: number) => DivisionService.delete(id),
+        onSuccess: () => {
+            QueryClient.invalidateQueries({ queryKey: ["divisions"] });
+        },
+    });
+};

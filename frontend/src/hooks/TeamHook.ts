@@ -34,3 +34,14 @@ export const useModifyTeam = () => {
         },
     });
 };
+
+export const useDeleteTeam = () => {
+    const QueryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: number) => TeamService.delete(id),
+        onSuccess: () => {
+            QueryClient.invalidateQueries({ queryKey: ["teams"] });
+        },
+    });
+};

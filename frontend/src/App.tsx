@@ -6,6 +6,8 @@ import Matches from "./Pages/Matches";
 import Admin from "./Pages/Admin";
 import Draw from "./Pages/AdminChildPages/Draw";
 import AdminTeams from "./Pages/AdminChildPages/AdminTeams";
+import AdminDivisions from "./Pages/AdminChildPages/AdminDivisions";
+import AdminFields from "./Pages/AdminChildPages/AdminFields";
 
 function App() {
     return (
@@ -16,6 +18,8 @@ function App() {
             <Route path="/admin" element={<Admin />}>
                 <Route path="draw" element={<Draw />} />
                 <Route path="teams" element={<AdminTeams />} />
+                <Route path="divisions" element={<AdminDivisions />} />
+                <Route path="fields" element={<AdminFields />} />
             </Route>
         </Routes>
     );

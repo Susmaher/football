@@ -38,3 +38,14 @@ export const useModifyField = () => {
         },
     });
 };
+
+export const useDeleteField = () => {
+    const QueryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: number) => FieldService.delete(id),
+        onSuccess: () => {
+            QueryClient.invalidateQueries({ queryKey: ["fields"] });
+        },
+    });
+};
