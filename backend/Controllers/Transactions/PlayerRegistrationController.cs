@@ -16,7 +16,7 @@ namespace backend.Controllers.Transactions
             _context = context;
         }
 
-        public async Task<int> RegisterPlayer(PlayerRegistrationDto player) 
+        /*public async Task<int> RegisterPlayer(PlayerRegistrationDto player) 
         {
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -28,6 +28,6 @@ namespace backend.Controllers.Transactions
             {
                 //alma
             }
-        }
+        }*/
     }
 }
