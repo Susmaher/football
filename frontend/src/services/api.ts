@@ -11,4 +11,9 @@ const api = axios.create({
     },
 });
 
+export const getDivisions = async () => {
+    const response = await api.get("Divisions");
+    return response.data;
+};
+
 export default api;

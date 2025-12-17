@@ -18,7 +18,7 @@ namespace backend.Services.MatchValidation
         }
         public async Task<ServiceResponse<MatchValidationData>> ValidateMatchCreationAsync(PostMatchDto matchDto)
         {
-            if (await MatchAlreadyExistAsync(matchDto.HomeTeamId, matchDto.AwayTeamId, matchDto.Match_date))
+            if (await MatchAlreadyExistAsync(matchDto.HomeTeamId, matchDto.AwayTeamId, matchDto.Round))
             {
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
@@ -28,7 +28,7 @@ namespace backend.Services.MatchValidation
 
         public async Task<ServiceResponse<MatchValidationData>> ValidateMatchUpdateAsync(PutMatchDto matchDto)
         {
-            if (await MatchAlreadyExistAsync(matchDto.HomeTeamId, matchDto.AwayTeamId, matchDto.Match_date, matchDto.Id))
+            if (await MatchAlreadyExistAsync(matchDto.HomeTeamId, matchDto.AwayTeamId, matchDto.Round, matchDto.Id))
             {
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
@@ -103,7 +103,7 @@ namespace backend.Services.MatchValidation
             }
 
             //check if round is valid
-            if(round <= 0)
+            if(round < 0)
             {
                 response.Success = false;
                 response.Message = "Round cannot be a negative number";
@@ -150,22 +150,17 @@ namespace backend.Services.MatchValidation
                 return response;
             }
 
-            response.data = new MatchValidationData { Status = stat, HomeTeam =  homeTeam, AwayTeam = awayTeam, Division = division, Field = field, Referee = referee }; 
+            response.data = new MatchValidationData { Status = stat, HomeTeam = homeTeam, AwayTeam = awayTeam, Division = division, Field = field, Referee = referee }; 
             return response;
         }
 
-        private async Task<bool> MatchAlreadyExistAsync(int home, int away, DateTime? date, int? id = null)
+        private async Task<bool> MatchAlreadyExistAsync(int home, int away, int round, int? id = null)
         {
-            var sameValue = _context.Matches.Where(m => m.HomeTeamId == home && m.AwayTeamId == away);
+            var sameValue = _context.Matches.Where(m => m.HomeTeamId == home && m.AwayTeamId == away && m.Round == round);
 
             if (id.HasValue)
             {
                 sameValue = sameValue.Where(m => m.Id != id.Value);
-            }
-
-            if (date.HasValue)
-            {
-                sameValue = sameValue.Where(m => m.Match_date == date);
             }
 
             return await sameValue.AnyAsync();

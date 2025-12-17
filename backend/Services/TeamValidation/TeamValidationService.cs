@@ -21,7 +21,7 @@ namespace backend.Services.TeamValidation
                 return new ServiceResponse<TeamValidationData> { Success = false, Message = "A team with this name already exists" };
             }
 
-            return await ValidateCommonTeamRulesAsync(teamDto.DivisionId, teamDto.FieldId, teamDto.Points);
+            return await ValidateCommonTeamRulesAsync(teamDto.DivisionId, teamDto.FieldId, 0);
         }
         public async Task<ServiceResponse<TeamValidationData>> ValidateTeamUpdateAsync(PutTeamDto teamDto)
         {

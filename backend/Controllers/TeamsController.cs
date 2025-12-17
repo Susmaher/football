@@ -192,7 +192,7 @@ namespace backend.Controllers
             var team = new Team
             {
                 Name=tm.Name,
-                Points = tm.Points ?? 0,
+                Points = 0,
                 DivisionId = tm.DivisionId,
                 FieldId = tm.FieldId,
             }; 
