@@ -34,7 +34,7 @@ namespace backend.Services
             return await entity.AnyAsync();
         }
 
-        public async Task<ServiceResponse<bool>> NameAndBirthDateExistsAsync<T>(string name, DateOnly birth_date, int? id) where T : class, IEntityWithNameAndBirthDate
+        public async Task<ServiceResponse<bool>> NameAndBirthDateExistsAsync<T>(string name, DateOnly birth_date, int? id = null) where T : class, IEntityWithNameAndBirthDate
         {
             if (birth_date > DateOnly.FromDateTime(DateTime.UtcNow))
             {

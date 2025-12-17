@@ -2,6 +2,7 @@ using backend.Context;
 using backend.Services;
 using backend.Services.MatchEventValidation;
 using backend.Services.MatchValidation;
+using backend.Services.PlayerService;
 using backend.Services.TeamPlayerValidation;
 using backend.Services.TeamsValidation;
 using backend.Services.TeamValidation;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<ITeamValidationService, TeamValidationService>();
 builder.Services.AddScoped<IMatchValidationService, MatchValidationService>();
 builder.Services.AddScoped<IMatchEventValidationService, MatchEventValidationService>();
 builder.Services.AddScoped<ITeamPlayerValidationService, TeamPlayerValidationService>();
+builder.Services.AddScoped<IPlayerRegistration, PlayerRegistration>();
 
 builder.Services.AddCors(options =>
 {

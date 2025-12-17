@@ -1,5 +1,7 @@
 ﻿using backend.Context;
 using backend.Dtos;
+using backend.Dtos.Player;
+using backend.Services.PlayerService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,24 +12,19 @@ namespace backend.Controllers.Transactions
     public class PlayerRegistrationController : ControllerBase
     {
         private readonly FootballDbContext _context;
-
-        public PlayerRegistrationController(FootballDbContext context)
+        private readonly IPlayerRegistration _playerRegistration;
+        public PlayerRegistrationController(FootballDbContext context, IPlayerRegistration playerRegistration)
         {
             _context = context;
+            _playerRegistration = playerRegistration;
         }
 
-        /*public async Task<int> RegisterPlayer(PlayerRegistrationDto player) 
+        [HttpPost("Register")]
+        public async Task<ActionResult<GetPlayerDto>> RegisterPlayer(PlayerRegistrationDto player) 
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            var obj = await _playerRegistration.RegisterPlayerWithTeamAsync(player);
 
-            try
-            {
-                var newPlayer = 
-            }
-            catch
-            {
-                //alma
-            }
-        }*/
+            return Ok(obj);
+        }
     }
 }
