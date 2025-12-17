@@ -1,9 +1,9 @@
 import { useState, type JSX } from "react";
-import AddTeam from "../../components/AdminComponents/teamcomp/AddTeam";
-import ModifyTeam from "../../components/AdminComponents/teamcomp/ModifyTeam";
-import DeleteTeam from "../../components/AdminComponents/teamcomp/DeleteTeam";
+import ModifyPosition from "../../components/AdminComponents/positioncomp/ModifyPosition";
+import AddPosition from "../../components/AdminComponents/positioncomp/AddPosition";
+import DeletePosition from "../../components/AdminComponents/positioncomp/DeletePosition";
 
-function AdminTeams(): JSX.Element {
+function AdminPositions(): JSX.Element {
     const [selectedForm, setSelectedForm] = useState<string | null>(null);
 
     const handleClick = (form: string) => {
@@ -19,24 +19,24 @@ function AdminTeams(): JSX.Element {
     return (
         <>
             <h3>
-                Ez itt a csapatok kiállitása és szerkesztésének lehetősége kérem
+                Ez itt a pozíciók kiállitása és szerkesztésének lehetősége kérem
                 szépen
             </h3>
 
             <button onClick={() => handleClick("add")}>
-                Csapat hozzáadása
+                Pozíció hozzáadása
             </button>
             <button onClick={() => handleClick("modify")}>
-                Csapat módosítása
+                Pozíció módosítása
             </button>
             <button onClick={() => handleClick("delete")}>
-                Csapat törlése
+                Pozíció törlése
             </button>
 
-            {selectedForm == "modify" && <ModifyTeam />}
-            {selectedForm == "add" && <AddTeam />}
-            {selectedForm == "delete" && <DeleteTeam />}
+            {selectedForm == "modify" && <ModifyPosition />}
+            {selectedForm == "add" && <AddPosition />}
+            {selectedForm == "delete" && <DeletePosition />}
         </>
     );
 }
-export default AdminTeams;
+export default AdminPositions;

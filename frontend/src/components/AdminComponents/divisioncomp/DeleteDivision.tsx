@@ -13,7 +13,7 @@ function DeleteDivision(): JSX.Element {
 
     async function onSubmit(data: DeleteInput) {
         try {
-            console.log(data);
+            //console.log(data);
             await deleteDivision.mutateAsync(data.id);
         } catch (error) {
             if (error instanceof AxiosError) {

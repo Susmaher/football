@@ -8,6 +8,9 @@ import Draw from "./Pages/AdminChildPages/Draw";
 import AdminTeams from "./Pages/AdminChildPages/AdminTeams";
 import AdminDivisions from "./Pages/AdminChildPages/AdminDivisions";
 import AdminFields from "./Pages/AdminChildPages/AdminFields";
+import AdminPositions from "./Pages/AdminChildPages/AdminPositions";
+import AdminPlayers from "./Pages/AdminChildPages/AdminPlayers";
+import AdminReferees from "./Pages/AdminChildPages/AdminReferees";
 
 function App() {
     return (
@@ -20,6 +23,9 @@ function App() {
                 <Route path="teams" element={<AdminTeams />} />
                 <Route path="divisions" element={<AdminDivisions />} />
                 <Route path="fields" element={<AdminFields />} />
+                <Route path="positions" element={<AdminPositions />} />
+                <Route path="players" element={<AdminPlayers />} />
+                <Route path="referees" element={<AdminReferees />} />
             </Route>
         </Routes>
     );

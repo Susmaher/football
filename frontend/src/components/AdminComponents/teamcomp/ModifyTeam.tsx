@@ -27,7 +27,7 @@ function ModifyTeam(): JSX.Element {
 
         try {
             //console.log("Route id: ", Number(selectedTeam.id));
-            console.log(data);
+            //console.log(data);
             await modifyTeam.mutateAsync({
                 id: Number(selectedTeam.id),
                 team: data,

@@ -1,20 +1,20 @@
 import { type JSX } from "react";
 import type { DeleteInput } from "../../../types/interfaces";
-import { useDeleteTeam, useTeams } from "../../../hooks/TeamHook";
 import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
+import { useDeleteReferee, useReferees } from "../../../hooks/RefereeHook";
 
-function DeleteTeam(): JSX.Element {
-    const { data: teams, isLoading } = useTeams();
+function DeleteReferee(): JSX.Element {
+    const { data: referees, isLoading } = useReferees();
 
-    const deleteTeam = useDeleteTeam();
+    const DeleteReferee = useDeleteReferee();
 
     const { register, handleSubmit } = useForm<DeleteInput>();
 
     async function onSubmit(data: DeleteInput) {
         try {
             //console.log(data);
-            await deleteTeam.mutateAsync(data.id);
+            await DeleteReferee.mutateAsync(data.id);
         } catch (error) {
             if (error instanceof AxiosError) {
                 console.log(error);
@@ -28,25 +28,30 @@ function DeleteTeam(): JSX.Element {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label>
-                    Válassz csapatot:
-                    {teams ? (
+                    Válassz játékost:
+                    {referees ? (
                         <select
                             {...register("id", {
-                                required: "A csapat megadása kötelező",
+                                required: "A bíró megadása kötelező",
                             })}
                             defaultValue=""
                             onChange={(e) => {
-                                const teamId = e.target.value;
-                                const team = teams.find((t) => t.id == teamId);
-                                console.log(team);
+                                const refereeId = e.target.value;
+                                const referee = referees.find(
+                                    (r) => r.id == refereeId
+                                );
+                                console.log(referee);
                             }}
                         >
                             <option value="" disabled>
-                                -- Válassz csapatot --
+                                -- Válassz bírót --
                             </option>
-                            {teams.map((team) => (
-                                <option key={team.id} value={team.id}>
-                                    {team.name}
+                            {referees.map((referee) => (
+                                <option key={referee.id} value={referee.id}>
+                                    {referee.name} -{" "}
+                                    {new Date(
+                                        referee.birth_date
+                                    ).toLocaleDateString()}
                                 </option>
                             ))}
                         </select>
@@ -55,10 +60,10 @@ function DeleteTeam(): JSX.Element {
                     )}
                 </label>
                 <br />
-                <button type="submit">Csapat törlése</button>
+                <button type="submit">Bíró törlése</button>
             </form>
         </div>
     );
 }
 
-export default DeleteTeam;
+export default DeleteReferee;

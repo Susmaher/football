@@ -18,10 +18,10 @@ function AdminFields(): JSX.Element {
 
     return (
         <>
-            <h1>
+            <h3>
                 Ez itt a pályák kiállitása és szerkesztésének lehetősége kérem
                 szépen
-            </h1>
+            </h3>
 
             <button onClick={() => handleClick("add")}>Pálya hozzáadása</button>
             <button onClick={() => handleClick("modify")}>

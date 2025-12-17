@@ -12,8 +12,9 @@ export interface MatchData {
     fieldName: string | null;
 }
 
+//---------------------------------------------------
 export interface DivisionData {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -22,12 +23,13 @@ export interface CreateDivisionAndFieldData {
 }
 
 export interface FieldData {
-    id: number;
+    id: string;
     name: string;
 }
 
+//---------------------------------------------------
 export interface TeamData {
-    id: number;
+    id: string;
     name: string;
     points: string;
     divisionId: string;
@@ -37,7 +39,7 @@ export interface TeamData {
 }
 
 export interface CreateTeamInputs {
-    name: number;
+    name: string;
     divisionId: number;
     fieldId: number;
 }
@@ -50,6 +52,70 @@ export interface ModifyTeamInputs {
     points: number;
 }
 
+//---------------------------------------------------
 export interface DeleteInput {
     id: number;
+}
+//---------------------------------------------------
+export interface CreatePositionInput {
+    name: string;
+}
+
+export interface PositionData {
+    id: string;
+    name: string;
+}
+
+//---------------------------------------------------
+export interface PlayerData {
+    id: string;
+    name: string;
+    birth_date: Date;
+    positionId: number;
+    positionName: string;
+}
+
+export interface CreatePlayerInput {
+    name: string;
+    birth_date: Date;
+    positionId: number;
+}
+
+export interface ModifyPlayerInput {
+    id: string;
+    name: string;
+    birth_date: Date;
+    positionId: number;
+}
+
+//---------------------------------------------------
+export interface RefereeData {
+    id: string;
+    name: string;
+    birth_date: Date;
+}
+
+export interface CreateRefereeInput {
+    name: string;
+    birth_date: Date;
+}
+
+//---------------------------------------------------
+export interface TeamPlayerData {
+    id: string;
+    teamId: number;
+    teamName: string;
+    playerId: number;
+    playerName: string;
+}
+
+export interface CreateTeamPlayerInput {
+    teamId: number;
+    playerId: number;
+}
+
+export interface ModifyTeamPlayerInput {
+    id: string;
+    teamId: number;
+    playerId: number;
 }

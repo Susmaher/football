@@ -1,20 +1,20 @@
 import { type JSX } from "react";
 import type { DeleteInput } from "../../../types/interfaces";
-import { useDeleteTeam, useTeams } from "../../../hooks/TeamHook";
 import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
+import { useDeletePlayer, usePlayers } from "../../../hooks/PlayerHook";
 
-function DeleteTeam(): JSX.Element {
-    const { data: teams, isLoading } = useTeams();
+function DeletePlayer(): JSX.Element {
+    const { data: players, isLoading } = usePlayers();
 
-    const deleteTeam = useDeleteTeam();
+    const deletePlayer = useDeletePlayer();
 
     const { register, handleSubmit } = useForm<DeleteInput>();
 
     async function onSubmit(data: DeleteInput) {
         try {
             //console.log(data);
-            await deleteTeam.mutateAsync(data.id);
+            await deletePlayer.mutateAsync(data.id);
         } catch (error) {
             if (error instanceof AxiosError) {
                 console.log(error);
@@ -28,25 +28,30 @@ function DeleteTeam(): JSX.Element {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label>
-                    Válassz csapatot:
-                    {teams ? (
+                    Válassz játékost:
+                    {players ? (
                         <select
                             {...register("id", {
-                                required: "A csapat megadása kötelező",
+                                required: "A játékos megadása kötelező",
                             })}
                             defaultValue=""
                             onChange={(e) => {
-                                const teamId = e.target.value;
-                                const team = teams.find((t) => t.id == teamId);
-                                console.log(team);
+                                const playerId = e.target.value;
+                                const player = players.find(
+                                    (p) => p.id == playerId
+                                );
+                                console.log(player);
                             }}
                         >
                             <option value="" disabled>
-                                -- Válassz csapatot --
+                                -- Válassz játékost --
                             </option>
-                            {teams.map((team) => (
-                                <option key={team.id} value={team.id}>
-                                    {team.name}
+                            {players.map((player) => (
+                                <option key={player.id} value={player.id}>
+                                    {player.name} -{" "}
+                                    {new Date(
+                                        player.birth_date
+                                    ).toLocaleDateString()}
                                 </option>
                             ))}
                         </select>
@@ -55,10 +60,10 @@ function DeleteTeam(): JSX.Element {
                     )}
                 </label>
                 <br />
-                <button type="submit">Csapat törlése</button>
+                <button type="submit">Játékos törlése</button>
             </form>
         </div>
     );
 }
 
-export default DeleteTeam;
+export default DeletePlayer;

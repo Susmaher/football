@@ -11,7 +11,7 @@ function AddField(): JSX.Element {
 
     async function onSubmit(data: CreateDivisionAndFieldData) {
         try {
-            console.log(data);
+            //console.log(data);
             await createField.mutateAsync(data);
         } catch (error) {
             if (error instanceof AxiosError) {

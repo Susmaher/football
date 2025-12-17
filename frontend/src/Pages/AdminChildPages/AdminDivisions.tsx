@@ -18,10 +18,10 @@ function AdminDivisions(): JSX.Element {
 
     return (
         <>
-            <h1>
+            <h3>
                 Ez itt az osztályok kiállitása és szerkesztésének lehetősége
                 kérem szépen
-            </h1>
+            </h3>
 
             <button onClick={() => handleClick("add")}>
                 Osztály hozzáadása

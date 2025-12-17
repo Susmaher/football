@@ -18,7 +18,7 @@ function ModifyField(): JSX.Element {
         if (!selectedField) return;
 
         try {
-            console.log(data);
+            //console.log(data);
             await modifyField.mutateAsync({
                 id: Number(selectedField.id),
                 field: data,

@@ -20,7 +20,7 @@ function AddTeam(): JSX.Element {
 
     async function onSubmit(data: CreateTeamInputs) {
         try {
-            console.log(data);
+            //console.log(data);
             await createTeam.mutateAsync(data);
         } catch (error) {
             if (error instanceof AxiosError) {

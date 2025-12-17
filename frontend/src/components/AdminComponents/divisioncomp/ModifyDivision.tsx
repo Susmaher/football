@@ -18,7 +18,7 @@ function ModifyDivision(): JSX.Element {
         if (!selectedDivision) return;
 
         try {
-            console.log(data);
+            //console.log(data);
             await modifyDivision.mutateAsync({
                 id: Number(selectedDivision.id),
                 division: data,

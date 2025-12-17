@@ -1,20 +1,20 @@
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
-import type { DeleteInput, FieldData } from "../../../types/interfaces";
+import type { DeleteInput, PositionData } from "../../../types/interfaces";
 import { AxiosError } from "axios";
-import { useDeleteField, useFields } from "../../../hooks/FieldHook";
+import { useDeletePosition, usePositions } from "../../../hooks/PositionHook";
 
-function DeleteField(): JSX.Element {
-    const { data: fields, isLoading } = useFields();
+function DeletePosition(): JSX.Element {
+    const { data: positions, isLoading } = usePositions();
 
-    const deleteField = useDeleteField();
+    const deletePosition = useDeletePosition();
 
     const { register, handleSubmit } = useForm<DeleteInput>();
 
     async function onSubmit(data: DeleteInput) {
         try {
             //console.log(data);
-            await deleteField.mutateAsync(data.id);
+            await deletePosition.mutateAsync(data.id);
         } catch (error) {
             if (error instanceof AxiosError) {
                 console.log(error);
@@ -29,26 +29,26 @@ function DeleteField(): JSX.Element {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <label>
                     Válassz pályát:
-                    {fields ? (
+                    {positions ? (
                         <select
                             {...register("id", {
-                                required: "A pálya megadása kötelező",
+                                required: "A pozíció megadása kötelező",
                             })}
                             defaultValue=""
                             onChange={(e) => {
-                                const fieldId = e.target.value;
-                                const field = fields.find(
-                                    (d) => d.id == fieldId
+                                const positionId = e.target.value;
+                                const position = positions.find(
+                                    (p) => p.id == positionId
                                 );
-                                console.log(field);
+                                console.log(position);
                             }}
                         >
                             <option value="" disabled>
-                                -- Válassz pályát --
+                                -- Válassz pozíciót --
                             </option>
-                            {fields.map((field: FieldData) => (
-                                <option key={field.id} value={field.id}>
-                                    {field.name}
+                            {positions.map((position: PositionData) => (
+                                <option key={position.id} value={position.id}>
+                                    {position.name}
                                 </option>
                             ))}
                         </select>
@@ -57,10 +57,10 @@ function DeleteField(): JSX.Element {
                     )}
                 </label>
                 <br />
-                <button type="submit">Pálya törlése</button>
+                <button type="submit">Pozíció törlése</button>
             </form>
         </div>
     );
 }
 
-export default DeleteField;
+export default DeletePosition;
