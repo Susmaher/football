@@ -78,9 +78,10 @@ namespace backend.Controllers
             }
 
             //validate whether name exists
-            if (await _validationService.NameExistsAsync<Division>(divisiondto.Name, divisiondto.Id))
+            var validationResponse = await _validationService.NameExistsAsync<Division>(divisiondto.Name, divisiondto.Id);
+            if (!validationResponse.Success)
             {
-                return BadRequest("A division with this name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             division.Name = divisiondto.Name;
@@ -112,9 +113,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DivisionDto>> PostDivision(PostDivisionDto divisiondto)
         {
-            if (await _validationService.NameExistsAsync<Division>(divisiondto.Name))
+            var validationResponse = await _validationService.NameExistsAsync<Division>(divisiondto.Name);
+            if (!validationResponse.Success)
             {
-                return BadRequest("A division with this name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             var division = new Division() 

@@ -64,9 +64,9 @@ namespace backend.Controllers
                 .Select(m => new GetMatchDto
                 {
                     Id = m.Id,
-                    Match_date = m.Match_date,
-                    Home_score = m.Status == MatchStatus.Played ? m.Home_score : null,
-                    Away_score = m.Status == MatchStatus.Played ? m.Away_score : null,
+                    MatchDate = m.MatchDate,
+                    HomeScore = m.Status == MatchStatus.Played ? m.HomeScore : null,
+                    AwayScore = m.Status == MatchStatus.Played ? m.AwayScore : null,
                     Round = m.Round,
                     Status = m.Status.ToString(),
                     HomeTeamId = m.HomeTeamId,
@@ -75,10 +75,10 @@ namespace backend.Controllers
                     AwayTeamName = m.AwayTeam!.Name,
                     DivisionId = m.DivisionId,
                     DivisionName = m.Division!.Name,
-                    RefereeId = m.Referee != null ? m.Referee!.Id : null,
-                    RefereeName = m.Referee != null ? m.Referee!.Name : null,
-                    FieldId = m.Field != null ? m.Field!.Id : null,
-                    FieldName = m.Field != null ? m.Field!.Name : null,
+                    RefereeId = m.Referee!.Id,
+                    RefereeName = m.Referee!.Name,
+                    FieldId = m.Field!.Id,
+                    FieldName = m.Field!.Name,
                 }).ToListAsync();
 
             return Ok(matches);
@@ -93,9 +93,9 @@ namespace backend.Controllers
                 .Select(m => new GetMatchDto
                 {
                     Id = m.Id,
-                    Match_date = m.Match_date,
-                    Home_score = m.Status == MatchStatus.Played ? m.Home_score : null,
-                    Away_score = m.Status == MatchStatus.Played ? m.Away_score : null,
+                    MatchDate = m.MatchDate,
+                    HomeScore = m.Status == MatchStatus.Played ? m.HomeScore : null,
+                    AwayScore = m.Status == MatchStatus.Played ? m.AwayScore : null,
                     Round = m.Round,
                     Status = m.Status.ToString(),
                     HomeTeamId = m.HomeTeamId,
@@ -104,10 +104,10 @@ namespace backend.Controllers
                     AwayTeamName = m.AwayTeam!.Name,
                     DivisionId = m.DivisionId,
                     DivisionName = m.Division!.Name,
-                    RefereeId = m.Referee != null ? m.Referee!.Id : null,
-                    RefereeName = m.Referee != null ? m.Referee!.Name : null,
-                    FieldId = m.Field != null ? m.Field!.Id : null,
-                    FieldName = m.Field != null ? m.Field!.Name : null,
+                    RefereeId = m.Referee!.Id,
+                    RefereeName = m.Referee!.Name,
+                    FieldId = m.Field!.Id,
+                    FieldName = m.Field!.Name,
                 }).FirstOrDefaultAsync();
 
             if (match == null)
@@ -140,9 +140,9 @@ namespace backend.Controllers
                 return BadRequest(validationResult.Message);
             }
 
-            match.Match_date = ma.Match_date;
-            match.Home_score = ma.Home_score;
-            match.Away_score = ma.Away_score;
+            match.MatchDate = ma.MatchDate;
+            match.HomeScore = ma.HomeScore;
+            match.AwayScore = ma.AwayScore;
             match.Status = validationResult.data!.Status;
             match.Round = ma.Round;
             match.HomeTeamId = ma.HomeTeamId;
@@ -185,9 +185,9 @@ namespace backend.Controllers
 
             var match = new Match
             {
-                Match_date = ma.Match_date,
-                Home_score = ma.Home_score,
-                Away_score = ma.Away_score,
+                MatchDate = ma.MatchDate,
+                HomeScore = ma.HomeScore,
+                AwayScore = ma.AwayScore,
                 Round = ma.Round,
                 Status = validationResult.data!.Status,
                 HomeTeamId = ma.HomeTeamId,
@@ -202,9 +202,9 @@ namespace backend.Controllers
 
             var returnMatch = new GetMatchDto {
                 Id = match.Id,
-                Match_date = match.Match_date,
-                Home_score = validationResult.data!.Status == MatchStatus.Played ? match.Home_score : null,
-                Away_score = validationResult.data!.Status == MatchStatus.Played ? match.Away_score : null,
+                MatchDate = match.MatchDate,
+                HomeScore = validationResult.data!.Status == MatchStatus.Played ? match.HomeScore : null,
+                AwayScore = validationResult.data!.Status == MatchStatus.Played ? match.AwayScore : null,
                 Round = match.Round,
                 Status = validationResult.data!.Status.ToString(),
                 HomeTeamId = match.HomeTeamId,
@@ -213,10 +213,10 @@ namespace backend.Controllers
                 AwayTeamName = validationResult.data.AwayTeam!.Name,
                 DivisionId = match.DivisionId,
                 DivisionName = validationResult.data.Division!.Name,
-                RefereeId = validationResult.data!.Referee != null ? validationResult.data.Referee!.Id : null,
-                RefereeName = validationResult.data!.Referee != null ? validationResult.data.Referee!.Name : null,
-                FieldId = validationResult.data!.Field != null ? validationResult.data.Field!.Id : null,
-                FieldName = validationResult.data!.Field != null ? validationResult.data.Field!.Name : null,
+                RefereeId = validationResult.data!.Referee!.Id,
+                RefereeName = validationResult.data!.Referee!.Name,
+                FieldId = validationResult.data!.Field!.Id,
+                FieldName = validationResult.data!.Field!.Name,
             };
 
             return CreatedAtAction("GetMatch", new { id = match.Id }, returnMatch);
@@ -313,7 +313,7 @@ namespace backend.Controllers
                     {
                         continue;
                     }
-                    home_match.FieldName = teams.Where(t => t.Id == home_match.HomeTeamId).Select(t => t.Field!.Name).FirstOrDefault();
+                    home_match.FieldName = teams.Where(t => t.Id == home_match.HomeTeamId).Select(t => t.Field!.Name).FirstOrDefault()!;
 
                     home_matches.Add(home_match);
                 }
@@ -343,7 +343,7 @@ namespace backend.Controllers
                     AwayTeamName = match.HomeTeamName,
                     RefereeId = referee.Id,
                     RefereeName = referee.Name,
-                    FieldName = teams.FirstOrDefault(t=>t.Id == match.AwayTeamId)?.Field?.Name,
+                    FieldName = teams.FirstOrDefault(t=>t.Id == match.AwayTeamId)!.Field!.Name,
                 };
                 away_matches.Add(away_match);
             }

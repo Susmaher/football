@@ -69,28 +69,28 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AwayTeamId")
+                    b.Property<int?>("AwayScore")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Away_score")
+                    b.Property<int>("AwayTeamId")
                         .HasColumnType("int");
 
                     b.Property<int>("DivisionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FieldId")
+                    b.Property<int>("FieldId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HomeScore")
                         .HasColumnType("int");
 
                     b.Property<int>("HomeTeamId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Home_score")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Match_date")
+                    b.Property<DateTime?>("MatchDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("RefereeId")
+                    b.Property<int>("RefereeId")
                         .HasColumnType("int");
 
                     b.Property<int>("Round")
@@ -159,7 +159,7 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Birth_date")
+                    b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
@@ -203,7 +203,7 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Birth_date")
+                    b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
@@ -317,7 +317,9 @@ namespace backend.Migrations
 
                     b.HasOne("backend.Models.Field", "Field")
                         .WithMany("Matches")
-                        .HasForeignKey("FieldId");
+                        .HasForeignKey("FieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Team", "HomeTeam")
                         .WithMany("HomeMatch")
@@ -327,7 +329,9 @@ namespace backend.Migrations
 
                     b.HasOne("backend.Models.Referee", "Referee")
                         .WithMany("Matches")
-                        .HasForeignKey("RefereeId");
+                        .HasForeignKey("RefereeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AwayTeam");
 

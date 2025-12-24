@@ -12,8 +12,8 @@ using backend.Context;
 namespace backend.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20251126180953_Initial")]
-    partial class Initial
+    [Migration("20251224121114_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,28 +72,28 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AwayTeamId")
+                    b.Property<int?>("AwayScore")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Away_score")
+                    b.Property<int>("AwayTeamId")
                         .HasColumnType("int");
 
                     b.Property<int>("DivisionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FieldId")
+                    b.Property<int>("FieldId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HomeScore")
                         .HasColumnType("int");
 
                     b.Property<int>("HomeTeamId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Home_score")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Match_date")
+                    b.Property<DateTime?>("MatchDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("RefereeId")
+                    b.Property<int>("RefereeId")
                         .HasColumnType("int");
 
                     b.Property<int>("Round")
@@ -162,7 +162,7 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Birth_date")
+                    b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
@@ -170,12 +170,32 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Position")
-                        .HasColumnType("longtext");
+                    b.Property<int>("PositionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PositionId");
+
                     b.ToTable("Players");
+                });
+
+            modelBuilder.Entity("backend.Models.Position", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("backend.Models.Referee", b =>
@@ -186,7 +206,7 @@ namespace backend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Birth_date")
+                    b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
@@ -300,7 +320,9 @@ namespace backend.Migrations
 
                     b.HasOne("backend.Models.Field", "Field")
                         .WithMany("Matches")
-                        .HasForeignKey("FieldId");
+                        .HasForeignKey("FieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Team", "HomeTeam")
                         .WithMany("HomeMatch")
@@ -310,7 +332,9 @@ namespace backend.Migrations
 
                     b.HasOne("backend.Models.Referee", "Referee")
                         .WithMany("Matches")
-                        .HasForeignKey("RefereeId");
+                        .HasForeignKey("RefereeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AwayTeam");
 
@@ -348,6 +372,17 @@ namespace backend.Migrations
                     b.Navigation("Team");
 
                     b.Navigation("TeamPlayer");
+                });
+
+            modelBuilder.Entity("backend.Models.Player", b =>
+                {
+                    b.HasOne("backend.Models.Position", "Position")
+                        .WithMany("Players")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("backend.Models.Team", b =>
@@ -410,6 +445,11 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Player", b =>
                 {
                     b.Navigation("TeamPlayer");
+                });
+
+            modelBuilder.Entity("backend.Models.Position", b =>
+                {
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("backend.Models.Referee", b =>

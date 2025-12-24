@@ -6,20 +6,20 @@ namespace backend.Dtos.Match
     public class GetMatchDto
     {
         public int Id { get; set; }
-        public DateTime? Match_date { get; set; }
-        public int? Home_score { get; set; }
-        public int? Away_score { get; set; }
+        public DateTime? MatchDate { get; set; }
+        public int? HomeScore { get; set; }
+        public int? AwayScore { get; set; }
         public int Round { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public int HomeTeamId { get; set; }
-        public string HomeTeamName { get; set; }
+        public string HomeTeamName { get; set; } = string.Empty;
         public int AwayTeamId { get; set; }
-        public string AwayTeamName { get; set; }
+        public string AwayTeamName { get; set; } = string.Empty;
         public int DivisionId { get; set; }
-        public string DivisionName { get; set; }
-        public int? RefereeId { get; set; }
-        public string? RefereeName { get; set; }
-        public int? FieldId { get; set; }
-        public string? FieldName { get; set; }
+        public string DivisionName { get; set; } = string.Empty;
+        public int RefereeId { get; set; }
+        public string RefereeName { get; set; } = string.Empty;
+        public int FieldId { get; set; }
+        public string FieldName { get; set; } = string.Empty;
     }
 }

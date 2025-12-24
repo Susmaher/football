@@ -76,9 +76,10 @@ namespace backend.Controllers
                 return NotFound("Position not found");
             }
 
-            if(await _validationService.NameExistsAsync<Position>(po.Name, id))
+            var validationResponse = await _validationService.NameExistsAsync<Position>(po.Name, id);
+            if (!validationResponse.Success)
             {
-                return BadRequest("Position with this name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             position.Name = po.Name;
@@ -109,9 +110,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<PositionDto>> PostPosition(PostPositionDto po)
         {
-            if(await _validationService.NameExistsAsync<Position>(po.Name))
+            var validationResponse = await _validationService.NameExistsAsync<Position>(po.Name);
+            if (!validationResponse.Success)
             {
-                return BadRequest("Position with this name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             var position = new Position { Name = po.Name };

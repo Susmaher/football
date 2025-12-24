@@ -16,18 +16,20 @@ namespace backend.Services.TeamValidation
 
         public async Task<ServiceResponse<TeamValidationData>> ValidateTeamCreationAsync(CreateTeamDto teamDto)
         {
-            if (await _commonValidation.NameExistsAsync<Team>(teamDto.Name))
+            var validationResponse = await _commonValidation.NameExistsAsync<Team>(teamDto.Name);
+            if (!validationResponse.Success)
             {
-                return new ServiceResponse<TeamValidationData> { Success = false, Message = "A team with this name already exists" };
+                return new ServiceResponse<TeamValidationData> { Success = false, Message = validationResponse.Message };
             }
 
             return await ValidateCommonTeamRulesAsync(teamDto.DivisionId, teamDto.FieldId, 0);
         }
         public async Task<ServiceResponse<TeamValidationData>> ValidateTeamUpdateAsync(PutTeamDto teamDto)
         {
-            if (await _commonValidation.NameExistsAsync<Team>(teamDto.Name, teamDto.Id))
+            var validationResponse = await _commonValidation.NameExistsAsync<Team>(teamDto.Name, teamDto.Id);
+            if (!validationResponse.Success)
             {
-                return new ServiceResponse<TeamValidationData> { Success = false, Message = "A team with this name already exists" };
+                return new ServiceResponse<TeamValidationData> { Success = false, Message = validationResponse.Message };
             }
 
             return await ValidateCommonTeamRulesAsync(teamDto.DivisionId, teamDto.FieldId, teamDto.Points);

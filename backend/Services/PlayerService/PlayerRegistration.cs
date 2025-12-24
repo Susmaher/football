@@ -26,21 +26,19 @@ namespace backend.Services.PlayerService
 
             try
             {
-                var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(player.Name, player.Birth_date);
+                var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(player.Name, player.BirthDate);
                 if (!validationResponse.Success)
                 {
                     throw new Exception(validationResponse.Message);
-                    //return BadRequest(validationResponse.Message);
                 }
 
                 var position = await _validationService.FindByIdAsync<Position>(player.PositionId);
                 if (position == null)
                 {
                     throw new Exception("Position not found");
-                    //return BadRequest("Position not found");
                 }
 
-                var newPlayer = new Player { Name = player.Name, Birth_date = player.Birth_date, PositionId = player.PositionId };
+                var newPlayer = new Player { Name = player.Name, BirthDate = player.BirthDate, PositionId = player.PositionId };
                 _context.Players.Add(newPlayer);
                 await _context.SaveChangesAsync();
 
@@ -68,7 +66,7 @@ namespace backend.Services.PlayerService
                     {
                         Id = newPlayer.Id,
                         Name = player.Name,
-                        Birth_date = player.Birth_date,
+                        BirthDate = player.BirthDate,
                         PositionId = player.PositionId,
                         PositionName = position.Name,
                     }
@@ -85,7 +83,7 @@ namespace backend.Services.PlayerService
             }
         }
 
-        public Task<ActionResult> ModifyPlayerWithTeamAsync()
+        public Task<ServiceResponse<GetPlayerDto>> ModifyPlayerWithTeamAsync()
         {
             throw new NotImplementedException();
         }

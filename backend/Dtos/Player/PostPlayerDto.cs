@@ -2,8 +2,8 @@
 {
     public class PostPlayerDto
     {
-        public string Name { get; set; }
-        public DateOnly Birth_date { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateOnly BirthDate { get; set; }
         public int PositionId { get; set; }
     }
 }

@@ -10,6 +10,6 @@
     }
     public interface IEntityWithNameAndBirthDate : IEntityWithName
     {
-        public DateOnly Birth_date { get; set; }
+        public DateOnly BirthDate { get; set; }
     }
 }

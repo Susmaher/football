@@ -47,7 +47,7 @@ namespace backend.Controllers
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Birth_date = p.Birth_date,
+                    BirthDate = p.BirthDate,
                     PositionId = p.PositionId,
                     PositionName = p.Position!.Name
                 }).ToListAsync();
@@ -65,7 +65,7 @@ namespace backend.Controllers
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Birth_date = p.Birth_date,
+                    BirthDate = p.BirthDate,
                     PositionId = p.PositionId,
                     PositionName = p.Position!.Name
                 })
@@ -119,7 +119,7 @@ namespace backend.Controllers
                 return BadRequest("Player not found");
             }
 
-            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date, pl.Id);
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.BirthDate, pl.Id);
             if (!validationResponse.Success)
             {
                 return BadRequest(validationResponse.Message);
@@ -131,7 +131,7 @@ namespace backend.Controllers
             }
 
             player.Name = pl.Name;
-            player.Birth_date = pl.Birth_date;
+            player.BirthDate = pl.BirthDate;
             player.PositionId = pl.PositionId;
 
             _context.Entry(player).State = EntityState.Modified;
@@ -160,7 +160,7 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<GetPlayerDto>> PostPlayer(PostPlayerDto pl)
         {
-            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.Birth_date);
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Player>(pl.Name, pl.BirthDate);
             if (!validationResponse.Success)
             {
                 return BadRequest(validationResponse.Message);
@@ -175,7 +175,7 @@ namespace backend.Controllers
             var player = new Player
             {
                 Name = pl.Name,
-                Birth_date = pl.Birth_date,
+                BirthDate = pl.BirthDate,
                 PositionId = pl.PositionId,
             };
 
@@ -186,7 +186,7 @@ namespace backend.Controllers
             {
                 Id = player.Id,
                 Name = player.Name,
-                Birth_date = player.Birth_date,
+                BirthDate = player.BirthDate,
                 PositionId = player.PositionId,
                 PositionName = position.Name,
             };

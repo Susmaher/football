@@ -103,7 +103,7 @@ namespace backend.Services.MatchEventValidation
             }
 
             var player = await _commonValidation.FindByIdAsync<Player>(teamPlayer.PlayerId);
-            response.data = new MatchEventValidationData { EventType = evType, Team = team, Player = player };
+            response.data = new MatchEventValidationData { EventType = evType, Team = team, Player = player! };
             return response;
         }
 

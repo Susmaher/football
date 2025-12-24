@@ -23,7 +23,7 @@ namespace backend.Services.MatchValidation
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
 
-            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId, matchDto.Match_date);
+            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.FieldId, matchDto.RefereeId, matchDto.HomeScore, matchDto.AwayScore, matchDto.MatchDate);
         }
 
         public async Task<ServiceResponse<MatchValidationData>> ValidateMatchUpdateAsync(PutMatchDto matchDto)
@@ -33,10 +33,10 @@ namespace backend.Services.MatchValidation
                 return new ServiceResponse<MatchValidationData> { Success = false, Message = "Match with this datas already exists" };
             }
 
-            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.Home_score, matchDto.Away_score, matchDto.FieldId, matchDto.RefereeId, matchDto.Match_date);
+            return await ValidateCommonMatchRulesAsync(matchDto.Status, matchDto.DivisionId, matchDto.AwayTeamId, matchDto.HomeTeamId, matchDto.Round, matchDto.FieldId, matchDto.RefereeId, matchDto.HomeScore, matchDto.AwayScore, matchDto.MatchDate);
         }
 
-        private async Task<ServiceResponse<MatchValidationData>> ValidateCommonMatchRulesAsync(string status, int divisionId, int AwayTeamId, int HomeTeamId, int round, int? homeScore = null, int? awayScore = null, int? fieldId = null, int? refereeId = null, DateTime? date = null)
+        private async Task<ServiceResponse<MatchValidationData>> ValidateCommonMatchRulesAsync(string status, int divisionId, int AwayTeamId, int HomeTeamId, int round, int fieldId, int refereeId, int? homeScore = null, int? awayScore = null, DateTime? date = null)
         {
             var response = new ServiceResponse<MatchValidationData>();
 
@@ -69,29 +69,21 @@ namespace backend.Services.MatchValidation
 
 
             //check if field exists
-            Field? field = null;
-            if (fieldId.HasValue)
+            var field = await _commonValidation.FindByIdAsync<Field>(fieldId);
+            if (field == null)
             {
-                field = await _commonValidation.FindByIdAsync<Field>(fieldId.Value);
-                if(field == null)
-                {
-                    response.Success = false;
-                    response.Message = "Field does not exist";
-                    return response;
-                }
+                response.Success = false;
+                response.Message = "Field does not exist";
+                return response;
             }
 
             //check if referee exists
-            Referee? referee = null;
-            if (refereeId.HasValue)
+            var referee = await _commonValidation.FindByIdAsync<Referee>(refereeId);
+            if (referee == null)
             {
-                referee = await _commonValidation.FindByIdAsync<Referee>(refereeId.Value);
-                if(referee == null)
-                {
-                    response.Success = false;
-                    response.Message = "Referee does not exist";
-                    return response;
-                }
+                response.Success = false;
+                response.Message = "Referee does not exist";
+                return response;
             }
 
             //check if datum is valid (played match cannot be in the future)
@@ -119,10 +111,10 @@ namespace backend.Services.MatchValidation
             }
 
             //if the match is completed, it mush have homescore, awayscore, field, and referee
-            if (stat == MatchStatus.Played && (homeScore == null || awayScore == null || fieldId == null || refereeId == null))
+            if (stat == MatchStatus.Played && (homeScore == null || awayScore == null))
             {
                 response.Success = false;
-                response.Message = "Completed matches need scores, a field, and a referee";
+                response.Message = "Completed matches need scores";
                 return response;
             }
 

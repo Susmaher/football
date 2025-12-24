@@ -11,11 +11,11 @@ namespace backend.Models
     public class Match : IEntityWithId
     {
         public int Id { get; set; }
-        public DateTime? Match_date { get; set; }
+        public DateTime? MatchDate { get; set; }
         [Range(0, 30)]
-        public int? Home_score { get; set; }
+        public int? HomeScore { get; set; }
         [Range(0, 30)]
-        public int? Away_score { get; set; }
+        public int? AwayScore { get; set; }
         [Required]
         [Range(0, 30)]
         public int Round { get; set; }
@@ -32,10 +32,9 @@ namespace backend.Models
         [Required]
         public int DivisionId { get; set; }
         public Division? Division { get; set; }
-
-        public int? RefereeId { get; set; }
+        public int RefereeId { get; set; }
         public Referee? Referee { get; set; }
-        public int? FieldId { get; set; }
+        public int FieldId { get; set; }
         public Field? Field { get; set; }
     }
 }

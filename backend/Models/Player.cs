@@ -8,9 +8,9 @@ namespace backend.Models
         public int Id { get; set; }
         [Required]
         [StringLength(50, MinimumLength = 2)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         [Required]
-        public DateOnly Birth_date { get; set; }
+        public DateOnly BirthDate { get; set; }
         [Required]
         public int PositionId { get; set; }
         public Position? Position { get; set; }

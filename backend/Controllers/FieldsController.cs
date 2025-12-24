@@ -76,10 +76,11 @@ namespace backend.Controllers
             {
                 return BadRequest("Field not found");
             }
-            
-            if(await _validationService.NameExistsAsync<Field>(fl.Name, id))
+
+            var validationResponse = await _validationService.NameExistsAsync<Field>(fl.Name, id);
+            if (!validationResponse.Success)
             {
-                return BadRequest("Field this with name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             field.Name = fl.Name;
@@ -110,9 +111,10 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<FieldDto>> PostField(PostFieldDto fl)
         {
-            if(await _validationService.NameExistsAsync<Field>(fl.Name))
+            var validationResponse = await _validationService.NameExistsAsync<Field>(fl.Name);
+            if (!validationResponse.Success)
             {
-                return BadRequest("Field with this name already exists");
+                return BadRequest(validationResponse.Message);
             }
 
             var field = new Field

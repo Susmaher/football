@@ -33,7 +33,7 @@ namespace backend.Controllers
                 {
                     Id = r.Id,
                     Name = r.Name,
-                    Birth_date = r.Birth_date,
+                    BirthDate = r.BirthDate,
                 })
                 .ToListAsync();
             return Ok(referees);
@@ -49,7 +49,7 @@ namespace backend.Controllers
                 {
                     Id = r.Id,
                     Name = r.Name,
-                    Birth_date = r.Birth_date,
+                    BirthDate = r.BirthDate,
                 })
                 .FirstOrDefaultAsync();
 
@@ -77,14 +77,14 @@ namespace backend.Controllers
                 return BadRequest("Referee not found");
             }
 
-            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date, rf.Id);
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.BirthDate, rf.Id);
             if (!validationResponse.Success)
             {
                 return BadRequest(validationResponse.Message);
             }
 
             referee.Name = rf.Name;
-            referee.Birth_date = rf.Birth_date;
+            referee.BirthDate = rf.BirthDate;
 
             _context.Entry(referee).State = EntityState.Modified;
 
@@ -112,7 +112,7 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<ActionResult<RefereeDto>> PostReferee(PostRefereeDto rf)
         {
-            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.Birth_date);
+            var validationResponse = await _validationService.NameAndBirthDateExistsAsync<Referee>(rf.Name, rf.BirthDate);
             if (!validationResponse.Success)
             {
                 return BadRequest(validationResponse.Message);
@@ -121,7 +121,7 @@ namespace backend.Controllers
             var referee = new Referee 
             { 
                 Name = rf.Name,
-                Birth_date = rf.Birth_date,
+                BirthDate = rf.BirthDate,
             };
 
             _context.Referees.Add(referee);
@@ -131,7 +131,7 @@ namespace backend.Controllers
             {
                 Id = referee.Id,
                 Name = referee.Name,
-                Birth_date = referee.Birth_date,
+                BirthDate = referee.BirthDate,
             };
 
             return CreatedAtAction("GetReferee", new { id = referee.Id }, returnReferee);
