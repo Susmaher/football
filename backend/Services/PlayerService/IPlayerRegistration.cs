@@ -7,6 +7,6 @@ namespace backend.Services.PlayerService
     public interface IPlayerRegistration
     {
         Task<ServiceResponse<GetPlayerDto>> RegisterPlayerWithTeamAsync(PlayerRegistrationDto player);
-        Task<ServiceResponse<GetPlayerDto>> ModifyPlayerWithTeamAsync();
+        Task<ServiceResponse<bool>> ModifyPlayerWithTeamAsync(PlayerModificationDto player);
     }
 }

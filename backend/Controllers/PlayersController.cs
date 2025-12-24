@@ -87,7 +87,7 @@ namespace backend.Controllers
                 .Where(tp => tp.PlayerId == id)
                 .Select(tp => new GetTeamPlayerDto
                 {
-                    Id = tp.PlayerId,
+                    Id = tp.Id,
                     TeamId = tp.TeamId,
                     TeamName = tp.Team!.Name,
                     PlayerId = tp.PlayerId,
